@@ -7,6 +7,12 @@
 #define MINMAP 10
 #define WIDTH 11
 #define HEIGHT 11
+#define ERROR(func_error, type_error) {                            \
+            char result [strlen(func_error)+strlen(type_error)+2]; \
+            sprintf(result, "%s: %s", func_error, type_error);     \
+            fprintf(stderr, "%s\n", result);                       \
+            return -1;                                             \
+        }
 
 void freeMap(int** arr, int height){
     for(int i=0;i<height;i++) free(arr[i]);
@@ -58,10 +64,17 @@ int** updateMap(int** arr, int height, int width){
 }
 
 int** initMap(int height, int width){
-    //malloc??
+    //malloc
     int** arr = (int**)malloc(height * sizeof(int*));
-    for (int i = 0; i < height; i++)
+    if (arr==NULL){
+        ERROR("Initialisation de la map", strerror(errno));
+    }
+    for (int i = 0; i < height; i++) {
         arr[i] = (int*)malloc(width * sizeof(int));
+        if (arr[i]==NULL){
+            ERROR("Initialisation de la map", strerror(errno));
+        }
+    }
 
     int nbr_bloc=0;
     //init
@@ -80,8 +93,8 @@ int** initMap(int height, int width){
 int** fillMap(int** arr, int height, int width){
     for (int i = 1; i < height; i+=2) {
         for (int j = 1; j < width; j+=2) {
-
-            if (rand()%(3-1 + 1) + 1!=3){//une chance sur 3 de check update
+            //deux chances sur 3 de mettre a jour une case
+            if (rand()%(3-1 + 1) + 1!=3){
                 //droite
                 if (j+2<width && arr[i][j+2]<arr[i][j]){
                     arr[i][j+2]=arr[i][j];
