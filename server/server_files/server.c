@@ -56,6 +56,9 @@ void *client_thread(void *socket)
     }
     else if (strcmp(command, REGIS))
     {
+        if(register_game(sock2,games)==-1){
+            perror("Error while registering in game");
+        }
     }
     else
     {
