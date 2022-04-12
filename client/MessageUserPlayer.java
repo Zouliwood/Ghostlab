@@ -1,8 +1,8 @@
 package client;
 
-import java.io.DataOutputStream;
-
 public interface MessageUserPlayer{
+
+    String END_TCP="***";
 
     default void inRangeUint8(int value) throws IndexOutOfBoundsException{
         if (value>255 || value<0){

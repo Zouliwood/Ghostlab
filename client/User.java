@@ -2,24 +2,16 @@ package client;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 public class User {
 
-    //TODO: do enum ?
-    private static final int SIZE_OF_HEAD=5;
-    private static final int SIZE_OF_END=3;
-    private static final String END_TCP="***";
-
     static class ConnectServerTCP implements Runnable {
-
-        //TODO: do enum?
-        private static final String GAMES="GAMES ";
-        private static final String OGAME="OGAME ";
 
         private final String hostName;
         private final int port;
-        //SendMessage.Deplacement movement;
 
         public ConnectServerTCP(String hostName, int port){
             this.port=port;
@@ -46,10 +38,10 @@ public class User {
 
                 //[GAME n***]
                 int nbrPlayersWaiting=0;
-                if (readInput(in, SIZE_OF_HEAD+1).equals(GAMES)){
+                if (readInput(in, 6).equals("GAMES ")){
                     nbrPlayersWaiting=in.readUnsignedByte() & 0xFF;
                     System.out.format("Il y a %d joueurs en salle d'attente.\n",nbrPlayersWaiting);
-                    if (!readInput(in, SIZE_OF_END).equals(END_TCP)){
+                    if (!readInput(in, 3).equals("***")){
                         System.out.println(Error.responseServ);
                         throw new IOException();
                     }
@@ -60,12 +52,12 @@ public class User {
 
                 //[OGAME m s***]
                 for (int i = 0; i < nbrPlayersWaiting; i++) {
-                    if (readInput(in, SIZE_OF_HEAD+1).equals(OGAME)){
+                    if (readInput(in, 6).equals("OGAME ")){
                         int nbrGame=in.readUnsignedByte() & 0xFF;
                         readInput(in,1);
                         int nbrPlayersRegistred=in.readUnsignedByte() & 0xFF;
                         System.out.format("La partie numéro %d a %d joueurs dans sa salle d'attente.\n", nbrGame, nbrPlayersRegistred);
-                        if (!readInput(in, SIZE_OF_END).equals(END_TCP)){
+                        if (!readInput(in, 3).equals("***")){
                             System.out.println(Error.responseServ);
                             throw new IOException();
                         }
@@ -75,14 +67,39 @@ public class User {
                     }
                 }
 
-                //TODO: SendMessage messPlayer=new SendMessage(ot, ID, UDP);
-                //TODO: scanner for player
+                String pseudoClient = "";
+                while (pseudoClient.length()!=8){
+                    System.out.println("Veuillez saisir votre pseudo (8 charactères alphanumériques):");
+                    pseudoClient=new Scanner(System.in).nextLine();
+                }
 
-                //SendMessage messPlayer=new SendMessage(ot, 1, 1);
-                //InGame.Deplacement.goLeft(10);
+                int clientUDP=0;
+                while (clientUDP<1000 || clientUDP>9999){
+                    System.out.println("Veuillez saisir votre pseudo (4 chiffres):");
+                    clientUDP = new Scanner(System.in).nextInt();
+                }
 
-                Message m = new Message(ot);
-                m.listGame();
+                Message m=new Message(ot, in, pseudoClient, clientUDP);
+                Player p=new Player(ot, in, pseudoClient, clientUDP);
+
+                int gameChoice=-1;
+                while (gameChoice!=0 && gameChoice!=1){
+                    System.out.println("Voulez créer [0] ou rejoindre [1] une partie:");
+                    gameChoice=new Scanner(System.in).nextInt();
+                }
+                if (gameChoice == 0) {
+                    m.createGame(pseudoClient, clientUDP);
+                } else {
+                    int idGame = -1;
+                    while (idGame < 0 || idGame > 255) {
+                        System.out.println("Entrez le numéro de la partie que vous souhaitez rejoindre:");
+                        idGame = new Scanner(System.in).nextInt();
+                    }
+                    m.joinGame(clientUDP, idGame);
+                }
+                while (true){
+                    //TODO: scanner for player
+                }
 
             } catch (Exception e) {
                 System.out.println(e);
@@ -94,11 +111,52 @@ public class User {
     private static class Message implements MessageUserPlayer{
 
         DataOutputStream ot;
+        DataInputStream in;
+        int clientUDP;
+        String pseudoClient;
 
-        public Message(DataOutputStream ot){
+        public Message(DataOutputStream ot, DataInputStream in, String pseudoClient, int clientUDP){
             this.ot=ot;
+            this.in=in;
+            this.clientUDP=clientUDP;
+            this.pseudoClient=pseudoClient;
         }
 
+        //[NEWPL id port***]
+        public void createGame(String idPlayer, int UDPPlayer) {
+            try{
+                String s="NEWPL "+this.pseudoClient+" port"+END_TCP;
+                byte[] request=s.getBytes();
+                byte[]udpplayer=ByteBuffer.allocate(4).putInt(UDPPlayer).array();
+                System.arraycopy(udpplayer, 0, request, 15, 4);
+                this.ot.write(request);
+            }catch(IndexOutOfBoundsException e){
+                System.out.println(Error.valueInt);
+                e.printStackTrace();
+            } catch (IOException e) {
+                System.out.println(Error.requestServ);
+                e.printStackTrace();
+            }
+        }
+
+        //[REGIS id port m***]
+        public void joinGame(int UDPPlayer, int idGame){
+            try{
+                String s="REGIS "+this.pseudoClient+" port m"+END_TCP;
+                byte[] request=s.getBytes();
+                inRangeUint8(idGame);
+                request[20]=(byte)idGame;
+                byte[]udpplayer=ByteBuffer.allocate(4).putInt(UDPPlayer).array();
+                System.arraycopy(udpplayer, 0, request, 15, 4);
+                this.ot.write(request);
+            }catch(IndexOutOfBoundsException e){
+                System.out.println(Error.valueInt);
+                e.printStackTrace();
+            } catch (IOException e) {
+                System.out.println(Error.requestServ);
+                e.printStackTrace();
+            }
+        }
 
         @Override
         public void sizeMaze(int idMap) {

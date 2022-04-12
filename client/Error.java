@@ -8,7 +8,7 @@ public enum Error {
 
     private final String nameError;
 
-    private Error(String nameError) {
+    Error(String nameError) {
         this.nameError = nameError;
     }
 }

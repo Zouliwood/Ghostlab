@@ -1,5 +1,6 @@
 package client;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -7,17 +8,15 @@ import java.net.SocketException;
 
 public class Player {
 
-    //TODO: do enum ?
-    private static final int SIZE_OF_HEAD=5;
-    private static final int SIZE_OF_END=3;
-    private static final String END_TCP="***";
-
-    private final int idPlayer;
+    private final String idPlayer;
     private final DataOutputStream ot;
+    private final DataInputStream in;
 
-    public Player(int idPlayer, DataOutputStream ot){
+    public Player(DataOutputStream ot, DataInputStream in, String idPlayer, int UDPClient){
         this.idPlayer=idPlayer;
         this.ot=ot;
+        this.in=in;
+        (new ConnectServerUDP("", UDPClient)).run();
     }
 
     class ConnectServerUDP implements Runnable {
@@ -46,9 +45,14 @@ public class Player {
         //[START***]
         private void readyPlay(){
             try{
+                //request
                 String s="START"+END_TCP;
                 byte[] request=s.getBytes();
                 Player.this.ot.write(request);
+                //response
+                //TODO: [WELCO m h w f ip port***]
+                int idGame, heightMap, widthMap, nbrGhost, ipMultiDiff, portMultiDiff;
+                Player.this.in.read();
             } catch (IOException e) {
                 System.out.println(Error.requestServ);
                 e.printStackTrace();
