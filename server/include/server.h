@@ -16,12 +16,16 @@
 #define SIZE_OF_HEAD 5
 #define SIZE_OF_END 3
 #define END_TCP "***"
+// commandes server
 #define GAMES "GAMES"
 #define OGAME "OGAME"
 #define REGOK "REGOK"
 #define REGNO "REGNO"
 #define DUNNO "DUNNO"
-
+// commandes client
+#define NEWPL "NEWPL"
+#define REGIS "REGIS"
+#define IQUIT "IQUIT"
 void *client_thread(void *socket);
 
 #endif

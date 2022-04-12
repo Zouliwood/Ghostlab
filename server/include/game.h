@@ -3,6 +3,7 @@
 
 #define MAX_PLAYER 20
 #include <stdint.h>
+#include <stdio.h>
 #include "list.h"
 
 struct game
@@ -12,5 +13,7 @@ struct game
     int encours; // -1 notstarted // 0 ingame
 };
 typedef struct game game;
+
+game *get_game(listElements *games,uint8_t game_id); 
 
 #endif
