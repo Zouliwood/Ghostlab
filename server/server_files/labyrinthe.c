@@ -1,12 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-
-#define MAXMAP 999
-#define MINMAP 10
-#define WIDTH 11
-#define HEIGHT 11
+#include "labyrinthe.h"
 #define ERROR(func_error, type_error) {                            \
             char result [strlen(func_error)+strlen(type_error)+2]; \
             sprintf(result, "%s: %s", func_error, type_error);     \
@@ -152,15 +144,4 @@ int** createMap(int height, int width){
 
     arr= fillMap(arr, height, width);
     return arr;
-}
-
-int main() {
-
-    int**map= createMap(HEIGHT, WIDTH);
-
-    printMap(map, HEIGHT, WIDTH);
-
-    freeMap(map, HEIGHT);
-
-    return 0;
 }

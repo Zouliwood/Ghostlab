@@ -45,6 +45,28 @@ void *client_thread(void *socket)
     {
         perror("Error while sending GAMES/ 0GAME");
     }
+    char command[SIZE_OF_HEAD + 1];
+    int count = recv(sock2, command, SIZE_OF_HEAD, 0);
+    command[count] = '\0';
+    if (strcmp(command, NEWPL))
+    {
+        if(new_game(sock2,games)==-1){
+            perror("Error while creating new game");
+        }
+    }
+    else if (strcmp(command, REGIS))
+    {
+        if(register_game(sock2,games)==-1){
+            perror("Error while registering in game");
+        }
+    }
+    else
+    {
+        if (func_send_dunno(sock2) == -1)
+        {
+            perror("Error while sending DUNNO");
+        }
+    }
 
     close(sock2);
     return NULL;
