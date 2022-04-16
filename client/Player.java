@@ -2,22 +2,12 @@ package client;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 public class Player {
 
-    private final String idPlayer;
-    private final DataOutputStream ot;
-    private final DataInputStream in;
-
-    public Player(DataOutputStream ot, DataInputStream in, String idPlayer, int UDPClient){
-        this.idPlayer=idPlayer;
-        this.ot=ot;
-        this.in=in;
+    public Player(int UDPClient){
         (new ConnectServerUDP("", UDPClient)).run();
     }
 
@@ -36,6 +26,7 @@ public class Player {
             try {
                 DatagramSocket socket_client = new DatagramSocket(port);
                 //TODO: udp connection
+                //TODO: multi-diffusion
             } catch (SocketException e) {
                 e.printStackTrace();
             }

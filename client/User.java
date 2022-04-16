@@ -8,7 +8,6 @@ import java.util.Scanner;
 
 public class User {
 
-    //TODO:0new 1lobby 2inscrit 3start 4ingame 5endGame->1lobby
     private static int status=0;
 
     static class ConnectServerTCP implements Runnable {
@@ -30,6 +29,38 @@ public class User {
                 throw new IOException();
             }
             return new String(input_header, StandardCharsets.UTF_8);
+        }
+
+        public void execOtherCmd(DataOutputStream ot, DataInputStream in, Message m, MessagePlayer mp, int status){
+            String propositionCmdPlayer="";
+            if (status==1 || status==2){
+                //avant de choisir une partie
+                propositionCmdPlayer+="Description de la partie [0]\n";
+                propositionCmdPlayer+="Liste des joueurs inscrits [1]\n";
+                propositionCmdPlayer+="Liste des parties en attentes [2]";
+                if(status==2){
+                    //avant de lancer la partie (start):
+                    propositionCmdPlayer+="\nSe désinscrire de la partie [3]:";
+                }else propositionCmdPlayer+=":";
+            }
+            int resOther=-1;
+            while (resOther!=0 && resOther!=1 && resOther!=2 && resOther!=3){
+                System.out.println(propositionCmdPlayer);
+                resOther=new Scanner(System.in).nextInt();
+            }
+            if (resOther==0 || resOther==1){
+                int nGame=-1;
+                while (nGame<0 || nGame>255){
+                    System.out.println("Veillez selectionner une partie (entre 0 et 255):");
+                    nGame=new Scanner(System.in).nextInt();
+                }
+                if (resOther==1) m.listPlayer(ot, in, nGame);
+                else m.sizeMaze(ot, in, nGame);
+            } else if (resOther==2) {
+                m.listGame(ot, in);
+            } else {
+                if (mp.quitGame()) status=1;
+            }
         }
 
         @Override
@@ -85,19 +116,22 @@ public class User {
 
                 Message m=new Message(ot, in, pseudoClient, clientUDP);
                 MessagePlayer mp=new MessagePlayer(ot, in, pseudoClient, clientUDP);
-                Player p=new Player(ot, in, pseudoClient, clientUDP);
+                Player p=new Player(clientUDP);
 
                 //user information has been registered correctly
                 User.status=1;
 
-                //TODO: scanner for player
                 int idGame = -1;
                 while (true){
                     if (status==1){
                         boolean flag;
                         int gameChoice=-1;
                         while (gameChoice!=0 && gameChoice!=1 && gameChoice!=2){
-                            System.out.println("Voulez créer [0], rejoindre [1] une partie ou réaliser une autre action [2]:");
+                            System.out.println(
+                                    "Créer une partie [0]\n"+
+                                    "Rejoindre une partie [1]\n"+
+                                    "Réaliser une autre action [2]:"
+                            );
                             gameChoice=new Scanner(System.in).nextInt();
                         }
                         if (gameChoice == 0) {
@@ -110,7 +144,7 @@ public class User {
                             flag=m.joinGame(clientUDP, idGame);
                         }else{
                             flag=false;
-                            //TODO: execOtherCmd(1);
+                            execOtherCmd(ot, in, m, mp, 1);
                         }
                         if (flag)status++;
                     }
@@ -118,23 +152,31 @@ public class User {
                         boolean flag;
                         int startGame=-1;
                         while (startGame!=0 && startGame!=1){
-                            System.out.println("Voulez vous valider votre inscription à la partie [0] ou bien réaliser une autre action [1]:");
+                            System.out.println(
+                                    "Valider votre inscription à la partie [0]\n"+
+                                    "Réaliser une autre action [1]:"
+                            );
                             startGame=new Scanner(System.in).nextInt();
                         }
                         if (startGame==1){
                             flag=mp.readyPlay();
                         }else{
                             flag=false;
-                            //TODO: execOtherCmd(2);//current step -> filter cmd
+                            execOtherCmd(ot, in, m, mp, 2);//current step -> filter cmd
                         }
                         if (flag)status++;//partie commence
                     }
-                    if (status==3){//TODO: gerer fin de partie avec le message GOBYE
+                    if (status==3){
                         boolean flag;
-                        while (true){
+                        do{
                             int gameActn=-1;
                             while (gameActn!=0 && gameActn!=1 && gameActn!=2 && gameActn!=3){
-                                System.out.println("Abbandonner la partie [0], demander la liste des joueurs présents [1], envoyer un essage à tous les joueurs [2], envoyer un message à un seul joueur [3]");
+                                System.out.println(
+                                        "Abbandonner la partie [0]\n"+
+                                        "Demander la liste des joueurs présents [1]\n"+
+                                        "Envoyer un essage à tous les joueurs [2]\n"+
+                                        "Envoyer un message à un seul joueur [3]:"
+                                );
                                 gameActn=new Scanner(System.in).nextInt();
                             }
                             if (gameActn==0) flag=mp.quitGame();
@@ -154,14 +196,10 @@ public class User {
                                     flag=mp.messOnePlayer(messagePlayer, destPlayer);
                                 }else flag=mp.messAllPlayer(messagePlayer);
                             }
-                            if (flag)break;
-                        }
+                        }while (!flag);
                         status=1;
                     }
-
-
                 }
-
             } catch (Exception e) {
                 System.out.println(e);
                 e.printStackTrace();
@@ -414,9 +452,6 @@ public class User {
             return false;
         }
 
-        /**
-         *
-         */
         private class Deplacement{
 
             //[DOMOV d***] [UPMOV d***] [RIMOV d***] [LEMOV d***]
