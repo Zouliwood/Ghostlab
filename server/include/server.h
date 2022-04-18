@@ -22,10 +22,18 @@
 #define REGOK "REGOK"
 #define REGNO "REGNO"
 #define DUNNO "DUNNO"
+#define UNROK "UNROK"
+#define LISTS "LIST!"
+#define PLAYR "PLAYR"
 // commandes client
 #define NEWPL "NEWPL"
 #define REGIS "REGIS"
 #define IQUIT "IQUIT"
+#define START "START"
+#define UNREG "UNREG"
+#define SIZEC "SIZE?"
+#define LISTC "LIST?"
+#define GAMEC "GAME?"
 void *client_thread(void *socket);
 
 #endif

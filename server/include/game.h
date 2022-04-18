@@ -11,6 +11,7 @@ struct game
     uint8_t game_id;
     listElements *joueurs;
     int encours; // -1 notstarted // 0 ingame
+    int start;
 };
 typedef struct game game;
 

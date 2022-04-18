@@ -27,13 +27,11 @@ int main(int argc, char const *argv[])
             pthread_t client;
             if (pthread_create(&client, NULL, client_thread, sock2) != 0)
             {
-                perror("Couldn't create threads");
+                printf("Couldn't create threads");
                 close(sock);
-                exit(1);
             }
         }
     }
-    close(sock);
     return 0;
 }
 
@@ -41,31 +39,70 @@ void *client_thread(void *socket)
 {
     int sock2 = *((int *)socket);
 
-    if (func_send_games(sock2, games) == -1)
+    func_send_games(sock2, games);
+    printf("GAMES SENDED to %d\n",sock2);
+    joueur *me = NULL;
+    while (1)
     {
-        perror("Error while sending GAMES/ 0GAME");
-    }
-    char command[SIZE_OF_HEAD + 1];
-    int count = recv(sock2, command, SIZE_OF_HEAD, 0);
-    command[count] = '\0';
-    if (strcmp(command, NEWPL))
-    {
-        if(new_game(sock2,games)==-1){
-            perror("Error while creating new game");
-        }
-    }
-    else if (strcmp(command, REGIS))
-    {
-        if(register_game(sock2,games)==-1){
-            perror("Error while registering in game");
-        }
-    }
-    else
-    {
-        if (func_send_dunno(sock2) == -1)
+        char command[SIZE_OF_HEAD + 1];
+        int count = recv(sock2, command, SIZE_OF_HEAD, 0);
+        command[count] = '\0';
+        printf("ALL good %d and %s\n",count,command);
+        if (strcmp(command, NEWPL)==0)
         {
-            perror("Error while sending DUNNO");
+            printf("creating game\n");
+            me = new_game(sock2, games);
         }
+        else if (strcmp(command, REGIS)==0)
+        {
+            printf("registering game\n");
+            me = register_game(sock2, games);
+        }
+        else if (strcmp(command, START)==0)
+        {
+            printf("start player \n");
+            start_game(me, sock2);
+            break;
+        }
+        else if (strcmp(command, UNREG)==0)
+        {
+            if (me == NULL)
+                func_send_dunno(sock2);
+            else
+                me = func_unreg(me, sock2);
+        }
+        else if (strcmp(command, SIZEC)==0)
+        {
+        }
+        else if (strcmp(command, GAMEC)==0)
+        {
+            func_send_games(sock2, games);
+        }
+        else if (strcmp(command, LISTC)==0)
+        {
+            char buffer[1 + sizeof(uint8_t)];
+            if (1 + sizeof(uint8_t) != recv(sock2, buffer, 1 + sizeof(uint8_t), 0))
+            {
+                func_send_dunno(sock2);
+            }
+            uint8_t m = *(uint8_t*)buffer + 1;
+            game *ptr = get_game(games, m);
+            if (ptr == NULL)
+            {
+                func_send_dunno(sock2);
+            }
+            else
+                send_list(sock2, ptr);
+        }
+        else
+        {
+            func_send_dunno(sock2);
+        }
+    }
+
+    while (me->current->encours == 1)
+    {
+        /* commande dans la game */
     }
 
     close(sock2);

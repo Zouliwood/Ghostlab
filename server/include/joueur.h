@@ -2,6 +2,7 @@
 #define PLAYER
 
 #include <stdint.h>
+#include "game.h"
 
 struct joueur
 {
@@ -10,6 +11,8 @@ struct joueur
     int x;
     int y;
     uint32_t score;
+    game *current;
+    int game_status;
 };
 typedef struct joueur joueur;
 
