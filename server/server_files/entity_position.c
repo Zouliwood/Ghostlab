@@ -46,14 +46,67 @@ void generic_move(void* entity, int isGhost, game game){
     }
 }
 
-void ghost_move(fantome fantome, game game){
-    generic_move(&fantome, 1, game);
-}
-
+/**
+ * AVANT UTILISATION: Vérifier que le nombre de cases vides est suffisant.
+ * @param fantome
+ * @param game
+ */
 void init_pos_player(joueur joueur, game game){
     generic_move(&joueur, 0, game);
+
+    //éviter les collisions
+    element* el=game.fantomes->first;
+    while (el!=NULL){
+        if ((*(fantome *)el).x == joueur.x && (*(fantome*)el).y == joueur.y){
+            init_pos_player(joueur, game);
+        }
+        el=game.fantomes->first->next;
+    }
+
+    el=game.joueurs->first;
+    while (el!=NULL){
+        if ((*(struct joueur*)el).x == joueur.x && (*(struct joueur*)el).y == joueur.y){
+            init_pos_player(joueur, game);
+        }
+        el=game.joueurs->first->next;
+    }
+
 }
 
+void no_collision(void (*mov)(fantome, game), fantome fantome, game game){
+    element* el=game.joueurs->first;
+    while (el!=NULL){
+        if ((*(joueur*)el).x == fantome.x && (*(joueur*)el).y == fantome.y){
+            mov(fantome, game);
+        }
+        el=game.joueurs->first->next;
+    }
+
+    el=game.fantomes->first;
+    while (el!=NULL){
+        if ((*(struct fantome *)el).x == fantome.x && (*(struct fantome*)el).y == fantome.y){
+            mov(fantome, game);
+        }
+        el=game.fantomes->first->next;
+    }
+}
+
+/**
+ * AVANT UTILISATION: Vérifier que le nombre de cases vides est suffisant.
+ * @param fantome
+ * @param game
+ */
+void ghost_move(fantome fantome, game game){
+    generic_move(&fantome, 1, game);
+    no_collision(ghost_move, fantome, game);
+}
+
+/**
+ * AVANT UTILISATION: Vérifier que le nombre de cases vides est suffisant.
+ * @param fantome
+ * @param game
+ */
 void init_ghost_move(fantome fantome, game game){
     generic_move(&fantome, 1, game);
+    no_collision(init_ghost_move, fantome, game);
 }
