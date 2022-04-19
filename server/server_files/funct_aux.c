@@ -2,7 +2,7 @@
 
 void* func_send_games(int sock2, listElements *games)
 {
-    int size_games = sizeof(uint8_t) + SIZE_OF_HEAD + 1 + SIZE_OF_END + 1;
+    int size_games = sizeof(uint8_t) + SIZE_OF_HEAD + SIZE_OF_END + 1;
     char games_mess[size_games];
     memmove(games_mess, GAMES, SIZE_OF_HEAD);
     memmove(games_mess + SIZE_OF_HEAD, " ", 1);
@@ -16,16 +16,18 @@ void* func_send_games(int sock2, listElements *games)
     element *ptr = games->first;
     for (int i = 0; i < games->count; i++)
     {
-        int taille = sizeof(uint8_t) * 2 + SIZE_OF_HEAD + 2 + SIZE_OF_END;
-        char game_mess[taille + 1];
+        uint8_t gamed_id = ((game *)ptr->data)->game_id;
+        printf("%d\n",gamed_id);
+        uint8_t player_count = ((game *)ptr->data)->joueurs->count;
+        printf("%d\n",player_count);
+        int taille = (sizeof(uint8_t) * 2) + SIZE_OF_HEAD + 2 + SIZE_OF_END;
+        char game_mess[taille];
         memmove(game_mess, OGAME, SIZE_OF_HEAD);
         memmove(game_mess + SIZE_OF_HEAD, " ", 1);
-        memmove(game_mess + SIZE_OF_HEAD + 1, &(((game *)ptr->data)->game_id), sizeof(uint8_t));
+        memmove(game_mess + SIZE_OF_HEAD + 1, &gamed_id, sizeof(uint8_t));
         memmove(game_mess + SIZE_OF_HEAD + 1 + sizeof(uint8_t), " ", 1);
-        memmove(game_mess + SIZE_OF_HEAD + 2 + sizeof(uint8_t), &(((game *)ptr->data)->joueurs->count), sizeof(uint8_t));
+        memmove(game_mess + SIZE_OF_HEAD + 2 + sizeof(uint8_t),&player_count, sizeof(uint8_t));
         memmove(game_mess + SIZE_OF_HEAD + 2 + (sizeof(uint8_t) * 2), END_TCP, SIZE_OF_END);
-        game_mess[taille] = '\0';
-        printf("%s\n", game_mess);
         if (taille != send(sock2, games_mess, taille, 0))
         {
             printf("Couldn't send OGAME");
@@ -38,7 +40,7 @@ void* func_send_games(int sock2, listElements *games)
 joueur *new_game(int sock2, listElements *games)
 {
     // recv suite de NEWPL_id_port***
-    int taille = 2 + SIZE_OF_END + 8 + 4;
+    int taille = 14 + SIZE_OF_END ;
     char buffer[taille];
     if (taille != recv(sock2, buffer, taille, 0))
     {
