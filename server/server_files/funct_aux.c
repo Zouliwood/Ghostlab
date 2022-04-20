@@ -28,7 +28,7 @@ void* func_send_games(int sock2, listElements *games)
         memmove(game_mess + SIZE_OF_HEAD + 1 + sizeof(uint8_t), " ", 1);
         memmove(game_mess + SIZE_OF_HEAD + 2 + sizeof(uint8_t),&player_count, sizeof(uint8_t));
         memmove(game_mess + SIZE_OF_HEAD + 2 + (sizeof(uint8_t) * 2), END_TCP, SIZE_OF_END);
-        if (taille != send(sock2, games_mess, taille, 0))
+        if (taille != send(sock2, game_mess, taille, 0))
         {
             printf("Couldn't send OGAME");
         }

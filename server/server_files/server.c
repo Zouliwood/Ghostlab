@@ -48,14 +48,14 @@ void *client_thread(void *socket)
         printf("count= %d and command= %s\n", count, command);
         if (strcmp(command, NEWPL) == 0)
         {
-            printf("creating game\n");
-            me = new_game(sock2, games);
-            printf("I'm %s\n", me->id);
+            if(me!=NULL)func_send_dunno(sock2);
+            else me = new_game(sock2, games);
         }
         else if (strcmp(command, REGIS) == 0)
         {
             printf("registering game\n");
-            me = register_game(sock2, games);
+            if(me!=NULL)func_send_dunno(sock2);
+            else me = register_game(sock2, games);
         }
         else if (strcmp(command, START) == 0)
         {
