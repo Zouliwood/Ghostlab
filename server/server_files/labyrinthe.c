@@ -1,10 +1,4 @@
 #include "labyrinthe.h"
-#define ERROR(func_error, type_error) {                            \
-            char result [strlen(func_error)+strlen(type_error)+2]; \
-            sprintf(result, "%s: %s", func_error, type_error);     \
-            fprintf(stderr, "%s\n", result);                       \
-            return -1;                                             \
-        }
 
 void freeMap(int** arr, int height){
     for(int i=0;i<height;i++) free(arr[i]);
@@ -126,6 +120,14 @@ int** fillMap(int** arr, int height, int width){
             arr[height-1][i]=0;
         }
     }
+
+    //attribuer le chiffre 1 aux murs et 0 au sol
+    for (int i = 0; i <height ; ++i) {
+        for (int j = 0; j <width ; ++j) {
+            arr[i][j]=(arr[i][j])?1:0;
+        }
+    }
+
     return arr;
 }
 

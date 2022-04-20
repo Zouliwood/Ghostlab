@@ -12,6 +12,10 @@ struct game
     listElements *joueurs;
     int encours; // -1 notstarted // 0 ingame
     int start;
+    int** map;
+    listElements *fantomes;
+    int heightMap;
+    int widthMap;
 };
 typedef struct game game;
 
