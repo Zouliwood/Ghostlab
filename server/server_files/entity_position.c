@@ -26,7 +26,7 @@ void player_move(game *game, int direction, joueur joueur, int distance){
             }
             joueur.y-=i;
         }
-        default:{ //LEFT
+        case LEFT:{
             for (i = 0; i <= distance; ++i) {
                 if (joueur.x-i<=0 || game->map[joueur.y][joueur.x-i]) break;
             }

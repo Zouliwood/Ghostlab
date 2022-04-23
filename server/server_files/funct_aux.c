@@ -1,4 +1,5 @@
 #include "funct_aux.h"
+#include "entity_position.h"
 
 void* func_send_games(int sock2, listElements *games)
 {
@@ -211,7 +212,7 @@ void* get_size_map(int sock, listElements* games){
         func_send_dunno(sock);
         return NULL;
     }
-    uint8_t game_id = *(uint8_t *)buffer[6];
+    uint8_t game_id = (uint8_t)buffer[6];
     element *el = games->first;
     while (el!=NULL){
         if(((game *)el->data)->game_id==game_id) break;
@@ -234,4 +235,61 @@ void* get_size_map(int sock, listElements* games){
         if (count != size)
             printf("Impossible d'envoyer la taille de la map");
     }
+}
+
+void* movPlayer(int sock,game game, joueur joueur){
+    int taille = 9+SIZE_OF_END;
+    char buffer[taille];
+    if (taille != recv(sock, buffer, taille, 0)){
+        func_send_dunno(sock);
+        return NULL;
+    }
+    char direction[5];
+    int dir;
+    memmove(direction, buffer, 5);
+    if (strcmp(direction,"UPMOV")==0) dir=0;
+    else if(strcmp(direction,"RIMOV")==0) dir=1;
+    else if(strcmp(direction,"DOMOV")==0) dir=2;
+    else if(strcmp(direction,"LEMOV")==0) dir=3;
+    else {
+        //TODO: send dunno?
+        func_send_dunno(sock);
+        return NULL;
+    }
+
+    char distance[3];
+    memmove(distance, buffer+6, 3);
+
+    player_move(&game, dir, joueur, atoi(distance));
+
+
+    //TODO: check if their are ghost
+    //TODO: [MOVEF x y p***]
+    //TODO: use lock
+    int x_joueur=joueur.x;
+    int y_joueur=joueur.y;
+
+    //TODO: refactor
+    char x_res[3];
+    if (x_joueur<100) sprintf(x_res, "0%d", x_joueur);
+    else if(x_joueur<10 && x_joueur>=0) sprintf(x_res, "00%d", x_joueur);
+    else sprintf(x_res, "%d", x_joueur);
+
+    char y_res[3];
+    if (x_joueur<100) sprintf(y_res, "0%d", y_joueur);
+    else if(x_joueur<10 && x_joueur>=0) sprintf(y_res, "00%d", y_joueur);
+    else sprintf(y_res, "%d", y_joueur);
+
+    //[MOVE! x y ***]
+    int size_list = SIZE_OF_HEAD+6+SIZE_OF_END;
+    char games_mess[size_list];
+    memmove(games_mess, MOVES, SIZE_OF_HEAD);
+    memmove(games_mess + SIZE_OF_HEAD, " ", 1);
+    memmove(games_mess + SIZE_OF_HEAD + 1, x_res, 3);
+    memmove(games_mess + SIZE_OF_HEAD + 4, " ", 1);
+    memmove(games_mess + SIZE_OF_HEAD + 5, y_res, 3);
+    memmove(games_mess + SIZE_OF_HEAD + 8, END_TCP, SIZE_OF_END);
+    if (size_list != send(sock, games_mess, size_list, 0))
+        printf("Coudln't send list!");
+
 }

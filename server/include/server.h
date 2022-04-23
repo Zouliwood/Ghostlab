@@ -26,6 +26,8 @@
 #define LISTS "LIST!"
 #define SIZES "SIZE!"
 #define PLAYR "PLAYR"
+#define MOVES "MOVE!"
+#define MOVEF "MOVEF"
 // commandes client
 #define NEWPL "NEWPL"
 #define REGIS "REGIS"

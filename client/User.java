@@ -59,7 +59,7 @@ public class User {
             } else if (resOther==2) {
                 m.listGame(ot, in);
             } else {
-                if (mp.quitGame()) status=1;
+                if (mp.unReadyPlay()) status=1;
             }
         }
 
@@ -158,9 +158,8 @@ public class User {
                             );
                             startGame=new Scanner(System.in).nextInt();
                         }
-                        if (startGame==1){
-                            flag=mp.readyPlay();
-                        }else{
+                        if (startGame==0) flag=mp.readyPlay();
+                        else{
                             flag=false;
                             execOtherCmd(ot, in, m, mp, 2);//current step -> filter cmd
                         }
@@ -170,18 +169,34 @@ public class User {
                         boolean flag;
                         do{
                             int gameActn=-1;
-                            while (gameActn!=0 && gameActn!=1 && gameActn!=2 && gameActn!=3){
+                            while (gameActn!=0 && gameActn!=1 && gameActn!=2 && gameActn!=3 && gameActn!=4){
                                 System.out.println(
                                         "Abbandonner la partie [0]\n"+
                                         "Demander la liste des joueurs présents [1]\n"+
                                         "Envoyer un essage à tous les joueurs [2]\n"+
-                                        "Envoyer un message à un seul joueur [3]:"
+                                        "Envoyer un message à un seul joueur [3]\n"+
+                                        "Réaliser un mouvement [4]:"
                                 );
                                 gameActn=new Scanner(System.in).nextInt();
                             }
                             if (gameActn==0) flag=mp.quitGame();
                             else if(gameActn==1) flag=mp.listPlayer(ot, in, idGame);
-                            else{
+                            else if(gameActn==4){
+                                boolean flagerror;
+                                flag=false;
+                                do{
+                                    System.out.println("Dans quelle direction souhaitez-vous vous déplacer [UPMOM, RIMOV, DOMOV ou LEMOV]?");
+                                    String direction=new Scanner(System.in).nextLine();
+                                    System.out.println("De combien de cases souhaitez-vous vous déplacer (nombre composé de 3 chiffres)?");
+                                    String distance=new Scanner(System.in).nextLine();
+                                    if (direction.equals("DOMOV") || direction.equals("UPMOV") || direction.equals("RIMOV") ||  direction.equals("LEMOV")) {
+                                        if (distance.length()!=3 || Integer.parseInt(distance)>999 || Integer.parseInt(distance)<0){
+                                            flagerror = false;
+                                            flag=mp.goMove(direction, distance);
+                                        }else flagerror=true;
+                                    }else flagerror=true;
+                                }while (flagerror);
+                            }else{
                                 String messagePlayer="-";
                                 while (!messagePlayer.matches("^[a-zA-Z0-9]*$")){
                                     System.out.println("Veillez entrez un message contenant des characters alphanumérique");
@@ -361,7 +376,7 @@ public class User {
         }
 
         //[UNREG***]
-        private void unReadyPlay(){
+        private boolean unReadyPlay(){
             try{
                 //requestre
                 String s="UNREG"+END_TCP;
@@ -376,11 +391,13 @@ public class User {
                 if (responseString.startsWith("UNROK ")){
                     idGame=response[6];
                     System.out.println("Vous avez bien été désincrit de la partie: "+idGame);
+                    return true;
                 }else System.out.println(Error.requestClient);
             } catch (IOException e) {
                 System.out.println(Error.requestServ);
                 e.printStackTrace();
             }
+            return false;
         }
 
         //[IQUIT***]
@@ -459,58 +476,59 @@ public class User {
             return false;
         }
 
-        private class Deplacement{
+        //Deplacement
 
-            //[DOMOV d***] [UPMOV d***] [RIMOV d***] [LEMOV d***]
-            private void goMove(String move, int nbrCase){
-                if (move.equals("DOMOV") || move.equals("UPMOV") || move.equals("RIMOV") ||  move.equals("LEMOV")){
-                    try{
-                        //request
-                        inRangeUint8(nbrCase);
-                        requestServMov(move, nbrCase);
-                        //response
-                        responseServMov();
-                    }catch(IndexOutOfBoundsException e){
-                        System.out.println(Error.nbrArgs);
-                    }
-                }else System.out.println(Error.requestClient);
+        //[DOMOV d***] [UPMOV d***] [RIMOV d***] [LEMOV d***]
+        public boolean goMove(String move, String nbrCase){//TODO: noni
+            try{
+                //request
+                requestServMov(move, nbrCase);
+                //response
+                return responseServMov();
+            }catch(IndexOutOfBoundsException e){
+                System.out.println(Error.nbrArgs);
             }
-
-            private void requestServMov(String direction, int nbrCase){
-                try {
-                    String s=direction+" d"+END_TCP;
-                    byte[] request=s.getBytes();
-                    request[6]=(byte)nbrCase;
-                    MessagePlayer.this.ot.write(request);
-                    MessagePlayer.this.ot.flush();
-                } catch (IOException e) {
-                    System.out.println(Error.requestServ);
-                }
-            }
-
-            private void responseServMov(){
-                byte[] response=readFirstMessage(MessagePlayer.this.in);
-                String responseString=new String(response, StandardCharsets.UTF_8);
-                if(responseString.startsWith("MOVE!") || responseString.startsWith("MOVEF")){
-
-                    byte[] coordb=new byte[3];
-                    System.arraycopy(response, 6, coordb, 0, 3);
-                    int coordX=Integer.parseInt(new String(coordb, StandardCharsets.UTF_8));
-
-                    System.arraycopy(response, 10, coordb, 0, 3);
-                    int coordY=Integer.parseInt(new String(coordb, StandardCharsets.UTF_8));
-
-                    byte[] nbrPts=new byte[4];
-                    System.arraycopy(response, 14, nbrPts, 0, 4);
-                    int nbrPtsPlayer=Integer.parseInt(new String(nbrPts, StandardCharsets.UTF_8));
-
-                    if(responseString.startsWith("MOVEF")){
-                        System.out.println("Vos nouvelles coordonées sont: ("+coordX+","+coordY+") "+" votre nouveau score est de "+nbrPtsPlayer);
-                    }else System.out.println("Vos nouvelles coordonées sont: ("+coordX+","+coordY+")");
-                }else System.out.println(Error.requestClient);
-            }
-
+            return false;
         }
+
+        private void requestServMov(String direction, String nbrCase){//TODO: ici
+            try {
+                String s=direction+" "+nbrCase+END_TCP;
+                byte[] request=s.getBytes();
+                MessagePlayer.this.ot.write(request);
+                MessagePlayer.this.ot.flush();
+            } catch (IOException e) {
+                System.out.println(Error.requestServ);
+            }
+        }
+
+        private boolean responseServMov(){
+            byte[] response=readFirstMessage(MessagePlayer.this.in);
+            String responseString=new String(response, StandardCharsets.UTF_8);
+            if(responseString.startsWith("MOVE!") || responseString.startsWith("MOVEF")){
+
+                byte[] coordb=new byte[3];
+                System.arraycopy(response, 6, coordb, 0, 3);
+                int coordX=Integer.parseInt(new String(coordb, StandardCharsets.UTF_8));
+
+                System.arraycopy(response, 10, coordb, 0, 3);
+                int coordY=Integer.parseInt(new String(coordb, StandardCharsets.UTF_8));
+
+                byte[] nbrPts=new byte[4];
+                System.arraycopy(response, 14, nbrPts, 0, 4);
+                int nbrPtsPlayer=Integer.parseInt(new String(nbrPts, StandardCharsets.UTF_8));
+
+                if(responseString.startsWith("MOVEF")){
+                    System.out.println("Vos nouvelles coordonées sont: ("+coordX+","+coordY+") "+" votre nouveau score est de "+nbrPtsPlayer);
+                }else System.out.println("Vos nouvelles coordonées sont: ("+coordX+","+coordY+")");
+            }else if(responseString.startsWith("GOBYE")){
+                System.out.println("La partie est terminé");
+                return true;
+            }else System.out.println(Error.requestClient);
+            return false;
+        }
+
+
     }
 
 }
