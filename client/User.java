@@ -74,7 +74,7 @@ public class User {
                 int nbrPlayersWaiting=0;
                 if (readInput(in, 6).equals("GAMES ")){
                     nbrPlayersWaiting=in.readUnsignedByte() & 0xFF;
-                    System.out.format("Il y a %d joueurs en salle d'attente.\n",nbrPlayersWaiting);
+                    System.out.format("Il y a %d parties en attente.\n",nbrPlayersWaiting);
                     if (!readInput(in, 3).equals("***")){
                         System.out.println(Error.responseServ);
                         throw new IOException();
@@ -230,6 +230,7 @@ public class User {
                 byte[]udpplayer=ByteBuffer.allocate(4).putInt(UDPPlayer).array();
                 System.arraycopy(udpplayer, 0, request, 15, 4);
                 this.ot.write(request);
+                this.ot.flush();
                 //response
                 int idGame;
                 byte[] response=readFirstMessage(this.in);
@@ -261,6 +262,7 @@ public class User {
                 byte[]udpplayer=ByteBuffer.allocate(4).putInt(UDPPlayer).array();
                 System.arraycopy(udpplayer, 0, request, 15, 4);
                 this.ot.write(request);
+                this.ot.flush();
                 //response
                 int idGameJ;
                 byte[] response=readFirstMessage(this.in);
@@ -304,6 +306,7 @@ public class User {
                 String s="START"+END_TCP;
                 byte[] request=s.getBytes();
                 this.ot.write(request);
+                this.ot.flush();
                 //response
                 byte[] response=readFirstMessage(in);
                 String responseString=new String(response, StandardCharsets.UTF_8);
@@ -364,6 +367,7 @@ public class User {
                 String s="UNREG"+END_TCP;
                 byte[] request=s.getBytes();
                 this.ot.write(request);
+                this.ot.flush();
                 //response
                 int idGame;
                 byte[] response=readFirstMessage(in);
@@ -385,6 +389,7 @@ public class User {
                 String s="IQUIT"+END_TCP;
                 byte[] request=s.getBytes();
                 this.ot.write(request);
+                this.ot.flush();
                 byte[] response=readFirstMessage(this.in);
                 String responseServeur=new String(response, StandardCharsets.UTF_8);
                 if (responseServeur.equals("GOBYE"+END_TCP)){
@@ -407,6 +412,7 @@ public class User {
                 String s="MAIL? "+message+" "+END_TCP;
                 byte[] request=s.getBytes();
                 this.ot.write(request);
+                this.ot.flush();
                 //response
                 byte[] response=readFirstMessage(this.in);
                 String responseString= new String(response, StandardCharsets.UTF_8);
@@ -427,6 +433,7 @@ public class User {
                 String s="SEND? "+idPlayerDest+" "+message+" "+END_TCP;
                 byte[] request=s.getBytes();
                 this.ot.write(request);
+                this.ot.flush();
                 byte[] response=readFirstMessage(this.in);
                 String responseString= new String(response, StandardCharsets.UTF_8);
                 switch (responseString){
@@ -475,6 +482,7 @@ public class User {
                     byte[] request=s.getBytes();
                     request[6]=(byte)nbrCase;
                     MessagePlayer.this.ot.write(request);
+                    MessagePlayer.this.ot.flush();
                 } catch (IOException e) {
                     System.out.println(Error.requestServ);
                 }

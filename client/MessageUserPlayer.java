@@ -47,6 +47,7 @@ public interface MessageUserPlayer {
             byte[] request=s.getBytes();
             request[6]=(byte)idMap;
             ot.write(request);
+            ot.flush();
             //response
             int idGame, hGame, wGame;
             byte[] response=readFirstMessage(in);
@@ -85,6 +86,7 @@ public interface MessageUserPlayer {
             byte[] request=s.getBytes();
             request[6]=(byte)idMap;
             ot.write(request);
+            ot.flush();
             //response
             int idGame, nbrPlayers;
             byte[] response=readFirstMessage(in);
@@ -124,6 +126,7 @@ public interface MessageUserPlayer {
             String s="GAME?"+END_TCP;
             byte[] request=s.getBytes();
             ot.write(request);
+            ot.flush();
             //response
             int nbrGames;
             byte[] response=readFirstMessage(in);
