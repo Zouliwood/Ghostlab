@@ -202,3 +202,36 @@ void *send_list(int sock, game *game_current)
     }
     return NULL;
 }
+
+void* get_size_map(int sock, listElements* games){
+    // [SIZE? m***]
+    int taille = 7 + SIZE_OF_END ;
+    char buffer[taille];
+    if (taille != recv(sock, buffer, taille, 0)){
+        func_send_dunno(sock);
+        return NULL;
+    }
+    uint8_t game_id = *(uint8_t *)buffer[6];
+    element *el = games->first;
+    while (el!=NULL){
+        if(((game *)el->data)->game_id==game_id) break;
+        el=el->next;
+    }
+    if (el==NULL) func_send_dunno(sock);
+    else{
+        //send size
+        int size = SIZE_OF_HEAD+8+SIZE_OF_END;
+        char response[size];
+        memmove(response, SIZES, SIZE_OF_HEAD);
+        memmove(response+SIZE_OF_HEAD, " ", 1);
+        memmove(response+SIZE_OF_HEAD+1, &game_id, sizeof(uint8_t));
+        memmove(response+SIZE_OF_HEAD+1+sizeof(uint8_t), " ", 1);
+        memmove(response+SIZE_OF_HEAD+2+sizeof(uint8_t), &((game *)el->data)->heightMap, sizeof(uint16_t));
+        memmove(response+SIZE_OF_HEAD+2+sizeof(uint8_t)+sizeof(uint16_t), " ", 1);
+        memmove(response+SIZE_OF_HEAD+3+sizeof(uint8_t)+sizeof(uint16_t), &((game *)el->data)->widthMap, sizeof(uint16_t));
+        memmove(response+SIZE_OF_HEAD+3+sizeof(uint8_t)+sizeof(uint16_t)*2, END_TCP, SIZE_OF_END);
+        int count = send(sock, response, size, 0);
+        if (count != size)
+            printf("Impossible d'envoyer la taille de la map");
+    }
+}

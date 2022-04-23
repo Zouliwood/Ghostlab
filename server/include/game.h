@@ -14,8 +14,8 @@ struct game
     int start;
     int** map;
     listElements *fantomes;
-    int heightMap;
-    int widthMap;
+    uint16_t heightMap;
+    uint16_t widthMap;
 };
 typedef struct game game;
 

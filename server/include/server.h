@@ -24,6 +24,7 @@
 #define DUNNO "DUNNO"
 #define UNROK "UNROK"
 #define LISTS "LIST!"
+#define SIZES "SIZE!"
 #define PLAYR "PLAYR"
 // commandes client
 #define NEWPL "NEWPL"
