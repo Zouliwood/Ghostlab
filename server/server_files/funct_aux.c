@@ -68,10 +68,13 @@ joueur *new_game(int sock2, listElements *games)
     addEl(games, games->last, new);
     j1->current = new;
     printf("envoie du message\n");
-    char message[SIZE_OF_END + SIZE_OF_HEAD];
+    taille=SIZE_OF_END+1+sizeof(uint8_t)+ SIZE_OF_HEAD;
+    char message[taille];
     memmove(message, REGOK, SIZE_OF_HEAD);
-    memmove(message + SIZE_OF_HEAD, END_TCP, SIZE_OF_END);
-    if ((SIZE_OF_END + SIZE_OF_HEAD) != send(sock2, message, SIZE_OF_END + SIZE_OF_HEAD, 0))
+    memmove(message+SIZE_OF_HEAD," ",1);
+    memmove(message+SIZE_OF_HEAD+1,&new->game_id,sizeof(uint8_t));
+    memmove(message + SIZE_OF_HEAD+1+sizeof(uint8_t), END_TCP, SIZE_OF_END);
+    if ((taille) != send(sock2, message, taille, 0))
     {
         printf("couldn't send regok");
     }
@@ -86,6 +89,7 @@ joueur *register_game(int sock2, listElements *games)
     if (taille != recv(sock2, buffer, taille, 0))
     {
         func_send_dunno(sock2);
+        printf("register taille != Dunno\n");
         return NULL;
     }
     uint8_t id = *(uint8_t *)(buffer + 15);
@@ -93,6 +97,7 @@ joueur *register_game(int sock2, listElements *games)
     if (!_game)
     {
         func_send_regno(sock2);
+        printf("id = %d regno\n",id);
         return NULL;
     }
     // création du joueur
@@ -105,12 +110,16 @@ joueur *register_game(int sock2, listElements *games)
     addEl(_game->joueurs, _game->joueurs->last, j1);
     j1->current = _game;
 
-    char message[SIZE_OF_END + SIZE_OF_HEAD];
+    taille=SIZE_OF_END+1+sizeof(uint8_t)+ SIZE_OF_HEAD;
+    char message[taille];
     memmove(message, REGOK, SIZE_OF_HEAD);
-    memmove(message + SIZE_OF_HEAD, END_TCP, SIZE_OF_END);
-    if ((SIZE_OF_END + SIZE_OF_HEAD) != send(sock2, message, SIZE_OF_END + SIZE_OF_HEAD, 0))
+    memmove(message+SIZE_OF_HEAD," ",1);
+    memmove(message+SIZE_OF_HEAD+1,&_game->game_id,sizeof(uint8_t));
+    memmove(message + SIZE_OF_HEAD+1+sizeof(uint8_t), END_TCP, SIZE_OF_END);
+    if ((taille) != send(sock2, message, taille, 0))
     {
         printf("couldn't send regok");
+        
         return NULL;
     }
     return j1;
@@ -206,18 +215,14 @@ void *send_list(int sock, game *game_current)
 
 void* get_size_map(int sock, listElements* games){
     // [SIZE? m***]
-    int taille = 7 + SIZE_OF_END ;
+    int taille = 1+sizeof(uint8_t)+ SIZE_OF_END ;
     char buffer[taille];
     if (taille != recv(sock, buffer, taille, 0)){
         func_send_dunno(sock);
         return NULL;
     }
-    uint8_t game_id = (uint8_t)buffer[6];
-    element *el = games->first;
-    while (el!=NULL){
-        if(((game *)el->data)->game_id==game_id) break;
-        el=el->next;
-    }
+    uint8_t game_id = (uint8_t)buffer[1];
+    element *el = get_game(games,game_id);
     if (el==NULL) func_send_dunno(sock);
     else{
         //send size
@@ -228,6 +233,7 @@ void* get_size_map(int sock, listElements* games){
         memmove(response+SIZE_OF_HEAD+1, &game_id, sizeof(uint8_t));
         memmove(response+SIZE_OF_HEAD+1+sizeof(uint8_t), " ", 1);
         memmove(response+SIZE_OF_HEAD+2+sizeof(uint8_t), &((game *)el->data)->heightMap, sizeof(uint16_t));
+        printf("Game id sent : %d and  height: %d\n",game_id,((game *)el->data)->heightMap);
         memmove(response+SIZE_OF_HEAD+2+sizeof(uint8_t)+sizeof(uint16_t), " ", 1);
         memmove(response+SIZE_OF_HEAD+3+sizeof(uint8_t)+sizeof(uint16_t), &((game *)el->data)->widthMap, sizeof(uint16_t));
         memmove(response+SIZE_OF_HEAD+3+sizeof(uint8_t)+sizeof(uint16_t)*2, END_TCP, SIZE_OF_END);

@@ -20,5 +20,7 @@ void* start_game(joueur *joueur,int socket);
 void *func_unreg(joueur *joueur, int sock);
 // LIST! + PLAYR
 void *send_list(int sock, game *game_current);
+// SIZE?
+void* get_size_map(int sock, listElements* games);
 
 #endif
