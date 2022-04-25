@@ -97,36 +97,3 @@ struct element* addEl(struct listElements *list, struct element *prevEl, void *d
     
     return newEl;
 }
-
-// Pull first (remove first + return it)
-void* pullFirst(struct listElements *list)
-{
-    if ((!list) || (!list->first)) { return NULL; }
-
-    void *el = list->first->data;
-
-    removeEl(list, list->first);
-    return el;
-}
-
-// Pull last (remove last + return it)
-void* pullLast(struct listElements *list)
-{
-    if ((!list) || (!list->last)) { return NULL; }
-
-    void *el = list->last->data;
-    removeEl(list, list->last);
-    return el;
-}
-
-// Push first (add first + return struct)
-struct element* pushFirst(struct listElements *list, void *data)
-{
-    return addEl(list, list->first, data);
-}
-
-// Push last (add last + return struct)
-struct element* pushLast(struct listElements *list, void *data)
-{
-    return addEl(list, list->last, data);
-}

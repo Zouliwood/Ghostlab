@@ -13,3 +13,11 @@ game* get_game(listElements *games,uint8_t game_id)
     }
     return NULL;
 }
+
+void* freeGame(game *ptr){
+    free(ptr->joueurs);
+    free(ptr->fantomes);
+    freeMap(ptr->map,ptr->heightMap);
+    free(ptr);
+    return NULL;
+}

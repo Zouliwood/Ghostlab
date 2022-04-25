@@ -4,6 +4,8 @@
 #include "game.h"
 #include "funct_aux.h"
 #include "joueur.h"
+#include "labyrinthe.h"
+#include "fantome.h"
 #include <stdio.h>
 #include <sys/socket.h>
 #include <sys/types.h>

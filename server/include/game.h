@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "list.h"
+#include "labyrinthe.h"
 
 struct game
 {
@@ -19,6 +20,7 @@ struct game
 };
 typedef struct game game;
 
-game *get_game(listElements *games,uint8_t game_id); 
+game *get_game(listElements *games,uint8_t game_id);
+void* freeGame(game *ptr); 
 
 #endif

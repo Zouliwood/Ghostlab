@@ -3,6 +3,8 @@
 #include "list.h"
 #include "server.h"
 #include "joueur.h"
+#include "entity_position.h"
+#include "labyrinthe.h"
 
 // NEWPL
 joueur* new_game(int sock2,listElements *games);
@@ -17,7 +19,7 @@ void* func_send_regno(int sock2);
 // START
 void* start_game(joueur *joueur,int socket);
 // UNREG
-void *func_unreg(joueur *joueur, int sock);
+void *func_unreg(joueur *joueur, listElements *games, int sock);
 // LIST! + PLAYR
 void *send_list(int sock, game *game_current);
 // SIZE?

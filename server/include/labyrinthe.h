@@ -16,7 +16,7 @@
             char result [strlen(func_error)+strlen(type_error)+2]; \
             sprintf(result, "%s: %s", func_error, type_error);     \
             fprintf(stderr, "%s\n", result);                       \
-            return -1;                                             \
+            return NULL;                                             \
         }
 
 void freeMap(int** arr, int height);

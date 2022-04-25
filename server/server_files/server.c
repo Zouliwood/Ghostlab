@@ -75,13 +75,15 @@ void *client_thread(void *socket)
         }
         else if (strcmp(command, UNREG) == 0)
         {
-            if (me == NULL)
+            char end[SIZE_OF_END];
+            int r = recv(sock2, end, SIZE_OF_END, 0);
+            if (me == NULL || r!=SIZE_OF_END)
             {
                 func_send_dunno(sock2);
                 printf("75 Dunno\n");
             }
             else
-                me = func_unreg(me, sock2);
+                me = func_unreg(me,games,sock2);
         }
         else if (strcmp(command, SIZEC) == 0)
         {
@@ -89,9 +91,8 @@ void *client_thread(void *socket)
         }
         else if (strcmp(command, GAMEC) == 0)
         {
-            char end[SIZE_OF_END + 1];
+            char end[SIZE_OF_END];
             int r = recv(sock2, end, SIZE_OF_END, 0);
-            end[r] = '\0';
             if (strcmp(END_TCP, end) == 0)
             {
                 func_send_games(sock2, games);
