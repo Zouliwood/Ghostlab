@@ -12,4 +12,9 @@ public enum Error {
     Error(String nameError) {
         this.nameError = nameError;
     }
+
+    @Override
+    public String toString() {
+        return nameError;
+    }
 }

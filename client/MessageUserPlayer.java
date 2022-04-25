@@ -96,13 +96,14 @@ public interface MessageUserPlayer {
                 nbrPlayers=response[8];
                 System.out.println("La partie "+idGame+" contient "+nbrPlayers+" joueurs.");
                 byte[] idPlayerb=new byte[8];
-                System.out.println("La liste des joueurs:");
+                if (nbrPlayers>0)System.out.println("La liste des joueurs:");
+                else System.out.println("Aucun joueur n'est inscrit dans la parite");
                 for (int i = 0; i < nbrPlayers; i++) {
                     byte[] secResponse=readMessage(in);
                     String secResponseString=new String(secResponse, StandardCharsets.UTF_8);
-                    if (secResponseString.startsWith("PLAYER ")){
-                        System.arraycopy(secResponse, 7, idPlayerb, 0, 8);
-                        System.out.println(new String(idPlayerb, StandardCharsets.UTF_8));
+                    if (secResponseString.startsWith("PLAYR ")){
+                        System.arraycopy(secResponse, 6, idPlayerb, 0, 8);
+                        System.out.println("Le joueur: "+new String(idPlayerb, StandardCharsets.UTF_8));
                     }
                 }
             }else if(responseString.equals("GOBYE"+END_TCP)){

@@ -128,7 +128,7 @@ public class User {
                         int gameChoice=-1;
                         while (gameChoice!=0 && gameChoice!=1 && gameChoice!=2){
                             System.out.println(
-                                    "Créer une partie [0]\n"+
+                                    "\nCréer une partie [0]\n"+
                                     "Rejoindre une partie [1]\n"+
                                     "Réaliser une autre action [2]:"
                             );
@@ -479,7 +479,7 @@ public class User {
         //Deplacement
 
         //[DOMOV d***] [UPMOV d***] [RIMOV d***] [LEMOV d***]
-        public boolean goMove(String move, String nbrCase){//TODO: noni
+        public boolean goMove(String move, String nbrCase){
             try{
                 //request
                 requestServMov(move, nbrCase);
@@ -491,7 +491,7 @@ public class User {
             return false;
         }
 
-        private void requestServMov(String direction, String nbrCase){//TODO: ici
+        private void requestServMov(String direction, String nbrCase){
             try {
                 String s=direction+" "+nbrCase+END_TCP;
                 byte[] request=s.getBytes();

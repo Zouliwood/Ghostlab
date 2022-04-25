@@ -232,7 +232,7 @@ void *send_list(int sock, game *game_current)
         memmove(game_mess + SIZE_OF_HEAD + 9, END_TCP, SIZE_OF_END);
         game_mess[taille] = '\0';
         printf("message sent %s\n", game_mess);
-        if (taille != send(sock, games_mess, taille, 0))
+        if (taille != send(sock, game_mess, taille, 0))
             printf("Couldn't send PLAYR %d\n", i);
         ptr = ptr->next;
     }
@@ -297,6 +297,7 @@ void* send_posit(int sock,joueur *joueur){
 
     return NULL;
 }
+*/
 /*
 void* movPlayer(int sock, joueur *joueur){
     game *game=joueur->current;
@@ -322,25 +323,18 @@ void* movPlayer(int sock, joueur *joueur){
     char distance[3];
     memmove(distance, buffer+6, 3);
 
-    player_move(&game, dir, *joueur, atoi(distance));
+    player_move(game, dir, *joueur, atoi(distance));
 
 
     //TODO: check if their are ghost
     //TODO: [MOVEF x y p***]
     //TODO: use lock
-    int x_joueur=joueur->x;
-    int y_joueur=joueur->y;
 
-    //TODO: refactor
-    char x_res[3];
-    if (x_joueur<100) sprintf(x_res, "0%d", x_joueur);
-    else if(x_joueur<10 && x_joueur>=0) sprintf(x_res, "00%d", x_joueur);
-    else sprintf(x_res, "%d", x_joueur);
+    char x_res[4];
+    sprintf(x_res, "%03d", joueur->x);
 
-    char y_res[3];
-    if (x_joueur<100) sprintf(y_res, "0%d", y_joueur);
-    else if(x_joueur<10 && x_joueur>=0) sprintf(y_res, "00%d", y_joueur);
-    else sprintf(y_res, "%d", y_joueur);
+    char y_res[4];
+    sprintf(y_res, "%03d", joueur->y);
 
     //[MOVE! x y ***]
     int size_list = SIZE_OF_HEAD+6+SIZE_OF_END;
