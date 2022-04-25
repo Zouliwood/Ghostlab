@@ -28,6 +28,8 @@
 #define PLAYR "PLAYR"
 #define MOVES "MOVE!"
 #define MOVEF "MOVEF"
+#define WELCO "WELCO"
+#define POSIT "POSIT"
 // commandes client
 #define NEWPL "NEWPL"
 #define REGIS "REGIS"

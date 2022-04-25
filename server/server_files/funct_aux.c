@@ -18,9 +18,7 @@ void* func_send_games(int sock2, listElements *games)
     for (int i = 0; i < games->count; i++)
     {
         uint8_t gamed_id = ((game *)ptr->data)->game_id;
-        printf("%d\n",gamed_id);
         uint8_t player_count = ((game *)ptr->data)->joueurs->count;
-        printf("%d\n",player_count);
         int taille = (sizeof(uint8_t) * 2) + SIZE_OF_HEAD + 2 + SIZE_OF_END;
         char game_mess[taille];
         memmove(game_mess, OGAME, SIZE_OF_HEAD);
@@ -188,15 +186,16 @@ void *func_unreg(joueur *joueur, int sock)
 
 void *send_list(int sock, game *game_current)
 {
-    int size_list = sizeof(uint8_t) + SIZE_OF_HEAD + 1 + SIZE_OF_END + 1;
+    int size_list = (sizeof(uint8_t)*2) + SIZE_OF_HEAD + 2 + SIZE_OF_END;
     char games_mess[size_list];
     memmove(games_mess, LISTS, SIZE_OF_HEAD);
     memmove(games_mess + SIZE_OF_HEAD, " ", 1);
     memmove(games_mess + SIZE_OF_HEAD + 1, &(game_current->game_id), sizeof(uint8_t));
-    memmove(games_mess + SIZE_OF_HEAD + 1 + sizeof(uint8_t), END_TCP, SIZE_OF_END);
+    memmove(games_mess + SIZE_OF_HEAD + 1 + sizeof(u_int8_t), " ", 1);
+    memmove(games_mess + SIZE_OF_HEAD + 2 + sizeof(u_int8_t), &(game_current->joueurs->count), sizeof(uint8_t));
+    memmove(games_mess + SIZE_OF_HEAD + 2 + (sizeof(uint8_t)*2), END_TCP, SIZE_OF_END);
     if (size_list != send(sock, games_mess, size_list, 0))
         printf("Coudln't send list!");
-
     element *ptr = game_current->joueurs->first;
     for (int i = 0; i < game_current->joueurs->count; i++)
     {
@@ -206,6 +205,8 @@ void *send_list(int sock, game *game_current)
         memmove(game_mess + SIZE_OF_HEAD, " ", 1);
         memmove(game_mess + SIZE_OF_HEAD + 1, &(((joueur *)ptr->data)->id), 8);
         memmove(game_mess + SIZE_OF_HEAD + 9, END_TCP, SIZE_OF_END);
+        game_mess[taille]='\0';
+        printf("message sent %s\n",game_mess);
         if (taille != send(sock, games_mess, taille, 0))
             printf("Couldn't send PLAYR %d\n",i);
         ptr = ptr->next;
@@ -222,7 +223,7 @@ void* get_size_map(int sock, listElements* games){
         return NULL;
     }
     uint8_t game_id = (uint8_t)buffer[1];
-    element *el = get_game(games,game_id);
+    game *el = get_game(games,game_id);
     if (el==NULL) func_send_dunno(sock);
     else{
         //send size
@@ -232,18 +233,44 @@ void* get_size_map(int sock, listElements* games){
         memmove(response+SIZE_OF_HEAD, " ", 1);
         memmove(response+SIZE_OF_HEAD+1, &game_id, sizeof(uint8_t));
         memmove(response+SIZE_OF_HEAD+1+sizeof(uint8_t), " ", 1);
-        memmove(response+SIZE_OF_HEAD+2+sizeof(uint8_t), &((game *)el->data)->heightMap, sizeof(uint16_t));
-        printf("Game id sent : %d and  height: %d\n",game_id,((game *)el->data)->heightMap);
+        memmove(response+SIZE_OF_HEAD+2+sizeof(uint8_t), &el->heightMap, sizeof(uint16_t));
+        printf("Game id sent : %d and  height: %d\n",game_id,el->heightMap);
         memmove(response+SIZE_OF_HEAD+2+sizeof(uint8_t)+sizeof(uint16_t), " ", 1);
-        memmove(response+SIZE_OF_HEAD+3+sizeof(uint8_t)+sizeof(uint16_t), &((game *)el->data)->widthMap, sizeof(uint16_t));
+        memmove(response+SIZE_OF_HEAD+3+sizeof(uint8_t)+sizeof(uint16_t), &el->widthMap, sizeof(uint16_t));
         memmove(response+SIZE_OF_HEAD+3+sizeof(uint8_t)+sizeof(uint16_t)*2, END_TCP, SIZE_OF_END);
         int count = send(sock, response, size, 0);
         if (count != size)
             printf("Impossible d'envoyer la taille de la map");
     }
+    return NULL;
 }
-
-void* movPlayer(int sock,game game, joueur joueur){
+/*
+void* send_welco(int sock,joueur *joueur){
+    int taille = SIZE_OF_HEAD+SIZE_OF_END+31; 
+    // ip = 15, space = 6,port = 4, fantome+game_id = 2,size = 4
+    char buffer[taille];
+    memmove(buffer,WELCO,SIZE_OF_HEAD);
+    memmove(buffer+SIZE_OF_HEAD," ",1);
+    memmove(buffer+SIZE_OF_HEAD+1,joueur->current->game_id,sizeof(uint8_t));
+    memmove(buffer+SIZE_OF_HEAD+1+sizeof(uint8_t)," ",1);
+    memmove(buffer+SIZE_OF_HEAD+2+sizeof(uint8_t),joueur->current->heightMap,sizeof(uint16_t));
+    memmove(buffer+SIZE_OF_HEAD+2+sizeof(uint8_t)+sizeof(uint16_t)," ",1);
+    memmove(buffer+SIZE_OF_HEAD+3+sizeof(uint8_t)+sizeof(uint16_t),joueur->current->widthMap,sizeof(uint16_t));
+    memmove(buffer+SIZE_OF_HEAD+3+sizeof(uint8_t)+(sizeof(uint16_t)*2)," ",1);
+    memmove(buffer+SIZE_OF_HEAD+4+sizeof(uint8_t)+(sizeof(uint16_t)*2),joueur->current->fantomes->count,sizeof(uint8_t));
+    if(taille!=send(sock,buffer,taille,0)){
+        printf("Coudln't send WELCO\n");
+    }
+    return NULL;
+}
+void* send_posit(int sock,joueur *joueur){
+    int taille =17+SIZE_OF_HEAD+SIZE_OF_END;
+    
+    return NULL;
+}
+/*
+void* movPlayer(int sock, joueur *joueur){
+    game *game=joueur->current;
     int taille = 9+SIZE_OF_END;
     char buffer[taille];
     if (taille != recv(sock, buffer, taille, 0)){
@@ -266,14 +293,14 @@ void* movPlayer(int sock,game game, joueur joueur){
     char distance[3];
     memmove(distance, buffer+6, 3);
 
-    player_move(&game, dir, joueur, atoi(distance));
+    player_move(&game, dir, *joueur, atoi(distance));
 
 
     //TODO: check if their are ghost
     //TODO: [MOVEF x y p***]
     //TODO: use lock
-    int x_joueur=joueur.x;
-    int y_joueur=joueur.y;
+    int x_joueur=joueur->x;
+    int y_joueur=joueur->y;
 
     //TODO: refactor
     char x_res[3];
@@ -298,4 +325,4 @@ void* movPlayer(int sock,game game, joueur joueur){
     if (size_list != send(sock, games_mess, size_list, 0))
         printf("Coudln't send list!");
 
-}
+}*/
