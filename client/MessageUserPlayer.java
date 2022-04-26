@@ -75,7 +75,7 @@ public interface MessageUserPlayer {
         }
     }
 
-    static byte[] converting(byte[] value) {
+    default byte[] converting(byte[] value) {
         final int length = value.length;
         byte[] res = new byte[length];
         for(int i = 0; i < length; i++) {

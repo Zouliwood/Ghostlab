@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class User {
@@ -46,13 +47,17 @@ public class User {
             int resOther=-1;
             while (resOther!=0 && resOther!=1 && resOther!=2 && resOther!=3){
                 System.out.println(propositionCmdPlayer);
-                resOther=new Scanner(System.in).nextInt();
+                try{
+                    resOther=new Scanner(System.in).nextInt();
+                }catch (InputMismatchException e){resOther=-1;}
             }
             if (resOther==0 || resOther==1){
                 int nGame=-1;
                 while (nGame<0 || nGame>255){
                     System.out.println("Veillez selectionner une partie (entre 0 et 255):");
-                    nGame=new Scanner(System.in).nextInt();
+                    try{
+                        nGame=new Scanner(System.in).nextInt();
+                    }catch (InputMismatchException e){nGame=-1;}
                 }
                 if (resOther==1) m.listPlayer(ot, in, nGame);
                 else m.sizeMaze(ot, in, nGame);
@@ -103,7 +108,7 @@ public class User {
                 }
 
                 String pseudoClient = "";
-                while (pseudoClient.length()!=8 && pseudoClient.matches("^[a-zA-Z0-9]*$")){
+                while (pseudoClient.length()!=8 || pseudoClient.matches(".*\\W+.*")){
                     System.out.println("Veuillez saisir votre pseudo (8 charactères alphanumériques):");
                     pseudoClient=new Scanner(System.in).nextLine();
                 }
@@ -111,7 +116,9 @@ public class User {
                 int clientUDP=0;
                 while (clientUDP<1000 || clientUDP>9999){
                     System.out.println("Veuillez saisir votre port (4 chiffres):");
-                    clientUDP = new Scanner(System.in).nextInt();
+                    try{
+                        clientUDP = new Scanner(System.in).nextInt();
+                    }catch (InputMismatchException e){clientUDP=-1;}
                 }
 
 
@@ -133,14 +140,18 @@ public class User {
                                     "Rejoindre une partie [1]\n"+
                                     "Réaliser une autre action [2]:"
                             );
-                            gameChoice=new Scanner(System.in).nextInt();
+                            try{
+                                gameChoice=new Scanner(System.in).nextInt();
+                            }catch (InputMismatchException e){gameChoice=-1;}
                         }
                         if (gameChoice == 0) {
                             flag=m.createGame(clientUDP);
                         } else if(gameChoice==1){
                             while (idGame < 0 || idGame > 255) {
                                 System.out.println("Entrez le numéro de la partie que vous souhaitez rejoindre:");
-                                idGame = new Scanner(System.in).nextInt();
+                                try{
+                                    idGame = new Scanner(System.in).nextInt();
+                                }catch (InputMismatchException e){idGame=-1;}
                             }
                             flag=m.joinGame(clientUDP, idGame);
                         }else{
@@ -157,7 +168,9 @@ public class User {
                                     "Valider votre inscription à la partie [0]\n"+
                                     "Réaliser une autre action [1]:"
                             );
-                            startGame=new Scanner(System.in).nextInt();
+                            try{
+                                startGame=new Scanner(System.in).nextInt();
+                            }catch (InputMismatchException e){startGame=-1;}
                         }
                         if (startGame==0) flag=mp.readyPlay();
                         else{
@@ -178,7 +191,9 @@ public class User {
                                         "Envoyer un message à un seul joueur [3]\n"+
                                         "Réaliser un mouvement [4]:"
                                 );
-                                gameActn=new Scanner(System.in).nextInt();
+                                try{
+                                    gameActn=new Scanner(System.in).nextInt();
+                                }catch (InputMismatchException e){gameActn=-1;}
                             }
                             if (gameActn==0) flag=mp.quitGame();
                             else if(gameActn==1) flag=mp.listPlayer(ot, in, idGame);
@@ -191,21 +206,23 @@ public class User {
                                     System.out.println("De combien de cases souhaitez-vous vous déplacer (nombre composé de 3 chiffres)?");
                                     String distance=new Scanner(System.in).nextLine();
                                     if (direction.equals("DOMOV") || direction.equals("UPMOV") || direction.equals("RIMOV") ||  direction.equals("LEMOV")) {
-                                        if (distance.length()!=3 || Integer.parseInt(distance)>999 || Integer.parseInt(distance)<0){
-                                            flagerror = false;
-                                            flag=mp.goMove(direction, distance);
-                                        }else flagerror=true;
+                                        try{
+                                            if (distance.length()!=3 || Integer.parseInt(distance)>999 || Integer.parseInt(distance)<0){//TODO: Parse
+                                                flagerror = false;
+                                                flag=mp.goMove(direction, distance);
+                                            }else flagerror=true;
+                                        }catch (NumberFormatException e){flagerror=true;}
                                     }else flagerror=true;
                                 }while (flagerror);
                             }else{
                                 String messagePlayer="-";
-                                while (!messagePlayer.matches("^[a-zA-Z0-9]*$")){
+                                while (messagePlayer.matches(".*\\W+.*")){
                                     System.out.println("Veillez entrez un message contenant des characters alphanumérique");
                                     messagePlayer=new Scanner(System.in).nextLine();
                                 }
                                 if (gameActn==3){
                                     String destPlayer="-";
-                                    while (!destPlayer.matches("^[a-zA-Z0-9]*$")){
+                                    while (destPlayer.matches(".*\\W+.*")){
                                         System.out.println("Veillez entrez un destinataire (characters alphanumérique)");
                                         messagePlayer=new Scanner(System.in).nextLine();
                                     }
@@ -332,11 +349,11 @@ public class User {
 
                     byte[] arrb=new byte[2];
                     System.arraycopy(response, 8, arrb, 0, 2);
-                    int heightMap=ByteBuffer.wrap(arrb).getInt();
+                    int heightMap=ByteBuffer.wrap(converting(arrb)).getChar();
 
 
                     System.arraycopy(response, 11, arrb, 0, 2);
-                    int widthMap=ByteBuffer.wrap(arrb).getInt();
+                    int widthMap=ByteBuffer.wrap(converting(arrb)).getChar();
 
                     int nbrGhost=response[14];
 
