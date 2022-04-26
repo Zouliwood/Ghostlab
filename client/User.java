@@ -31,7 +31,7 @@ public class User {
             return new String(input_header, StandardCharsets.UTF_8);
         }
 
-        public void execOtherCmd(DataOutputStream ot, DataInputStream in, Message m, MessagePlayer mp, int status){
+        public int execOtherCmd(DataOutputStream ot, DataInputStream in, Message m, MessagePlayer mp, int status){
             String propositionCmdPlayer="";
             if (status==1 || status==2){
                 //avant de choisir une partie
@@ -59,8 +59,9 @@ public class User {
             } else if (resOther==2) {
                 m.listGame(ot, in);
             } else {
-                if (mp.unReadyPlay()) status=1;
+                if (mp.unReadyPlay()) return 1;
             }
+            return status;
         }
 
         @Override
@@ -144,7 +145,7 @@ public class User {
                             flag=m.joinGame(clientUDP, idGame);
                         }else{
                             flag=false;
-                            execOtherCmd(ot, in, m, mp, 1);
+                            status=execOtherCmd(ot, in, m, mp, 1);
                         }
                         if (flag)status++;
                     }
@@ -161,7 +162,7 @@ public class User {
                         if (startGame==0) flag=mp.readyPlay();
                         else{
                             flag=false;
-                            execOtherCmd(ot, in, m, mp, 2);//current step -> filter cmd
+                            status=execOtherCmd(ot, in, m, mp, 2);//current step -> filter cmd
                         }
                         if (flag)status++;//partie commence
                     }

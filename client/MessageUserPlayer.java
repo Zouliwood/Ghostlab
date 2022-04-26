@@ -56,15 +56,13 @@ public interface MessageUserPlayer {
             if (responseString.startsWith("SIZE! ")){
                 idGame=response[6];
 
-                //TODO: LITTLE/BIG ENDIAN
                 byte[] hGameb=new byte[2];
-                System.arraycopy(response, 6, hGameb, 0, 2);
-                hGame= ByteBuffer.wrap(hGameb).getInt();
+                System.arraycopy(response, 8, hGameb, 0, 2);
+                hGame = ByteBuffer.wrap(converting(hGameb)).getChar();
 
-                //TODO: LITTLE/BIG ENDIAN
                 byte[] wGameb=new byte[2];
                 System.arraycopy(response, 11, wGameb, 0, 2);
-                wGame= ByteBuffer.wrap(wGameb).getInt();
+                wGame =  ByteBuffer.wrap(converting(wGameb)).getChar();
 
                 System.out.println("La map "+idGame+" est de hauter "+hGame+" et de largeur "+wGame);
             }else System.out.println(Error.requestClient);
@@ -76,6 +74,16 @@ public interface MessageUserPlayer {
             e.printStackTrace();
         }
     }
+
+    static byte[] converting(byte[] value) {
+        final int length = value.length;
+        byte[] res = new byte[length];
+        for(int i = 0; i < length; i++) {
+            res[length - i - 1] = value[i];
+        }
+        return res;
+    }
+
 
     //[LIST? m***] this.in && Player.this.in
     default boolean listPlayer(DataOutputStream ot, DataInputStream in, int idMap) {
@@ -142,7 +150,7 @@ public interface MessageUserPlayer {
                     if (secResponseSting.startsWith("OGAME ")){
                         idGame=secResponse[6];
                         nbrPlayers=secResponse[8];
-                        System.out.print("La partie "+idGame+" possède "+nbrPlayers+"joueurs");
+                        System.out.println("La partie "+idGame+" possède "+nbrPlayers+"joueurs");
                     }else System.out.println(Error.responseServ);
                 }
             }else System.out.println(Error.responseServ);
