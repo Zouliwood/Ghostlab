@@ -267,7 +267,7 @@ void *get_size_map(int sock, listElements *games)
     else
     {
         // send size
-        int size = SIZE_OF_HEAD + 8 + SIZE_OF_END;
+        int size = SIZE_OF_HEAD + 3+sizeof(uint8_t)+ (sizeof(uint16_t)*2) + SIZE_OF_END;
         char response[size];
         memmove(response, SIZES, SIZE_OF_HEAD);
         memmove(response + SIZE_OF_HEAD, " ", 1);
