@@ -91,8 +91,9 @@ void *client_thread(void *socket)
         }
         else if (strcmp(command, GAMEC) == 0)
         {
-            char end[SIZE_OF_END];
+            char end[SIZE_OF_END+1];
             int r = recv(sock2, end, SIZE_OF_END, 0);
+            end[r]='\0';
             if (strcmp(END_TCP, end) == 0)
             {
                 func_send_games(sock2, games);
