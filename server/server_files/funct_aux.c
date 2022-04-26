@@ -188,21 +188,32 @@ void *start_game(joueur *joueur, int socket)
 void *func_unreg(joueur *joueur, listElements *games, int sock)
 {
     // remove joueur from game and free mem
-    element *game;
-
+    uint8_t id = joueur->current->game_id;
+    element *game_ptr=games->first;
+    for(int i =0;i<games->count;i++){
+        if(((game *)game_ptr->data)->game_id==id){
+            break;
+        }
+        game_ptr=game_ptr->next;
+    }
     element *ptr = joueur->current->joueurs->first;
     while (ptr->data != joueur)
     {
         ptr = ptr->next;
     }
     removeEl(joueur->current->joueurs, ptr);
+    if(joueur->current->joueurs->count==0){
+        freeGame((game *)game_ptr->data);
+        removeEl(games,game_ptr);
+    }
     free(joueur);
-
     // send unrok
-    int taille = SIZE_OF_HEAD + SIZE_OF_END;
+    int taille = SIZE_OF_HEAD + SIZE_OF_END+ 1 + sizeof(uint8_t);
     char message[taille];
     memmove(message, UNROK, SIZE_OF_HEAD);
-    memmove(message + SIZE_OF_HEAD, END_TCP, SIZE_OF_END);
+    memmove(message+SIZE_OF_HEAD," ",1);
+    memmove(message+SIZE_OF_HEAD+1,&id,sizeof(uint8_t));
+    memmove(message + SIZE_OF_HEAD+1+sizeof(uint8_t), END_TCP, SIZE_OF_END);
     int count = send(sock, message, taille, 0);
     if (count != taille)
         printf("couldn't send unrok");
