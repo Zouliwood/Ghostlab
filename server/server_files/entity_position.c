@@ -4,31 +4,31 @@
 //TODO: mutex with struct
 //pthread_mutex_t verrou= PTHREAD_MUTEX_INITIALIZER;
 
-void player_move(game game, int direction, joueur* joueur, int distance){
+void player_move(game *game, int direction, joueur* joueur, int distance){
     int i;
     //pthread_mutex_lock(&verrou);
     switch (direction) {
         case TOP:{
             for (i = 0; i <= distance; ++i) {
-                if (joueur->y+i>=game.heightMap || game.map[joueur->y+i][joueur->x]) break;
+                if (joueur->y+i>=game->heightMap || game->map[joueur->y+i][joueur->x]) break;
             }
             joueur->y+=i;
         }
         case RIGHT:{
             for (i = 0; i <= distance; ++i) {
-                if (joueur->x+i>=game.widthMap || game.map[joueur->y][joueur->x+i]) break;
+                if (joueur->x+i>=game->widthMap || game->map[joueur->y][joueur->x+i]) break;
             }
             joueur->x+=i;
         }
         case BOTTOM:{
             for (i = 0; i <= distance; ++i) {
-                if (joueur->y-i<=0 || game.map[joueur->y-i][joueur->x]) break;
+                if (joueur->y-i<=0 || game->map[joueur->y-i][joueur->x]) break;
             }
             joueur->y-=i;
         }
         case LEFT:{
             for (i = 0; i <= distance; ++i) {
-                if (joueur->x-i<=0 || game.map[joueur->y][joueur->x-i]) break;
+                if (joueur->x-i<=0 || game->map[joueur->y][joueur->x-i]) break;
             }
             joueur->x-=i;
         }
@@ -36,13 +36,13 @@ void player_move(game game, int direction, joueur* joueur, int distance){
     //pthread_mutex_unlock(&verrou);
 }
 
-void generic_move(void* entity, int isGhost, game game){
+void generic_move(void* entity, int isGhost, game *game){
     int new_x, new_y;
     //pthread_mutex_lock(&verrou);
     do{
-        new_x=(rand()%(game.widthMap+1));
-        new_y=(rand()%(game.heightMap+1));
-    }while (!game.map[new_y][new_x]);
+        new_x=(rand()%(game->widthMap));
+        new_y=(rand()%(game->heightMap));
+    }while (!game->map[new_y][new_x]);
 
     if (isGhost){
         ((fantome *)entity)->x=new_x;
@@ -59,12 +59,12 @@ void generic_move(void* entity, int isGhost, game game){
  * @param fantome
  * @param game
  */
-void init_pos_player(joueur* joueur, game game){
+void init_pos_player(joueur* joueur, game *game){
     generic_move(&joueur, 0, game);
 
     //pthread_mutex_lock(&verrou);
     //éviter les collisions
-    element* el=game.fantomes->first;
+    element* el=game->fantomes->first;
     while (el!=NULL){
         if ((*(fantome *)el).x == joueur->x && (*(fantome*)el).y == joueur->y){
             init_pos_player(joueur, game);
@@ -72,7 +72,7 @@ void init_pos_player(joueur* joueur, game game){
         el=el->next;
     }
 
-    el=game.joueurs->first;
+    el=game->joueurs->first;
     while (el!=NULL){
         if ((*(struct joueur*)el).x == joueur->x && (*(struct joueur*)el).y == joueur->y){
             init_pos_player(joueur, game);
@@ -83,9 +83,9 @@ void init_pos_player(joueur* joueur, game game){
 
 }
 
-void no_collision(void (*mov)(fantome* fantome,game game), fantome* fantome, game game){
+void no_collision(void (*mov)(fantome* fantome,game *game), fantome* fantome, game *game){
     //pthread_mutex_lock(&verrou);
-    element* el=game.joueurs->first;
+    element* el=game->joueurs->first;
     while (el!=NULL){
         if ((*(joueur*)el).x == fantome->x && (*(joueur*)el).y == fantome->y){
             mov(fantome, game);
@@ -93,7 +93,7 @@ void no_collision(void (*mov)(fantome* fantome,game game), fantome* fantome, gam
         el=el->next;
     }
 
-    el=game.fantomes->first;
+    el=game->fantomes->first;
     while (el!=NULL){
         if ((*(struct fantome *)el).x == fantome->x && (*(struct fantome*)el).y == fantome->y){
             mov(fantome, game);
@@ -108,7 +108,7 @@ void no_collision(void (*mov)(fantome* fantome,game game), fantome* fantome, gam
  * @param fantome
  * @param game
  */
-void ghost_move(fantome* fantome, game game){
+void ghost_move(fantome* fantome, game *game){
     generic_move(fantome, 1, game);
     no_collision(ghost_move, fantome, game);
 }
@@ -118,7 +118,7 @@ void ghost_move(fantome* fantome, game game){
  * @param fantome
  * @param game
  */
-void init_ghost_move(fantome* fantome, game game){
+void init_ghost_move(fantome* fantome, game *game){
     generic_move(fantome, 1, game);
     no_collision(init_ghost_move, fantome, game);
 }

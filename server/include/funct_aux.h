@@ -26,7 +26,5 @@ void *send_list(int sock, game *game_current);
 void* get_size_map(int sock, listElements* games);
 // WELCO
 void* send_welco(int sock,joueur *joueur);
-// POSIT
-void* send_posit(int sock,joueur *joueur);
 
 #endif

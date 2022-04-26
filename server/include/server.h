@@ -10,7 +10,9 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netdb.h>
+#include <netinet/in.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>

@@ -28,10 +28,12 @@ int main(int argc, char const *argv[])
             if (pthread_create(&client, NULL, client_thread, sock2) != 0)
             {
                 printf("Couldn't create threads");
-                close(sock);
+                free(sock2);
             }
         }
     }
+    close(sock);
+    free(games);
     return 0;
 }
 
@@ -77,13 +79,19 @@ void *client_thread(void *socket)
         {
             char end[SIZE_OF_END];
             int r = recv(sock2, end, SIZE_OF_END, 0);
-            if (me == NULL || r!=SIZE_OF_END)
+            if (me == NULL || r != SIZE_OF_END)
             {
                 func_send_dunno(sock2);
                 printf("75 Dunno\n");
             }
             else
-                me = func_unreg(me,games,sock2);
+            {
+                me = func_unreg(me, games, sock2);
+                if (me == NULL)
+                {
+                    printf("ME is NULL \n");
+                }
+            }
         }
         else if (strcmp(command, SIZEC) == 0)
         {
@@ -91,9 +99,9 @@ void *client_thread(void *socket)
         }
         else if (strcmp(command, GAMEC) == 0)
         {
-            char end[SIZE_OF_END+1];
+            char end[SIZE_OF_END + 1];
             int r = recv(sock2, end, SIZE_OF_END, 0);
-            end[r]='\0';
+            end[r] = '\0';
             if (strcmp(END_TCP, end) == 0)
             {
                 func_send_games(sock2, games);
@@ -107,21 +115,22 @@ void *client_thread(void *socket)
         else if (strcmp(command, LISTC) == 0)
         {
             char buffer[SIZE_OF_END + 1 + sizeof(uint8_t)];
-            if (4 + sizeof(uint8_t) != recv(sock2, buffer,SIZE_OF_END+1+sizeof(uint8_t), 0))
+            if (4 + sizeof(uint8_t) != recv(sock2, buffer, SIZE_OF_END + 1 + sizeof(uint8_t), 0))
             {
                 func_send_dunno(sock2);
                 printf("111 Dunno\n");
             }
             else
             {
-                uint8_t m =(uint8_t)buffer[1];
+                uint8_t m = (uint8_t)buffer[1];
                 game *ptr = get_game(games, m);
                 if (ptr == NULL)
                 {
                     printf("109 Dunno\n");
                     func_send_dunno(sock2);
                 }
-                else send_list(sock2, ptr);
+                else
+                    send_list(sock2, ptr);
             }
         }
         else
@@ -133,9 +142,8 @@ void *client_thread(void *socket)
 
     while (me->current->encours == 1)
     {
-        /* commande dans la game */
+        send_welco(sock2,me);
     }
-
     close(sock2);
     return NULL;
 }
