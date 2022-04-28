@@ -313,7 +313,7 @@ void *get_size_map(int sock, listElements *games)
 }
 
 void* send_welco(int sock,joueur *joueur){
-    int taille = SIZE_OF_HEAD+SIZE_OF_END+16+(sizeof(uint8_t)*2)+(sizeof(uint16_t)*2)+4+6;
+    int taille = SIZE_OF_HEAD+SIZE_OF_END+16+(sizeof(uint8_t)*2)+(sizeof(uint16_t)*2)+4+5;
     char buffer[taille];
     memmove(buffer,WELCO,SIZE_OF_HEAD);
     memmove(buffer+SIZE_OF_HEAD," ",1);
@@ -329,16 +329,20 @@ void* send_welco(int sock,joueur *joueur){
     memmove(buffer+SIZE_OF_HEAD+20+(sizeof(uint8_t)*2)+(sizeof(uint16_t)*2)," ",1);
     memmove(buffer+SIZE_OF_HEAD+21+(sizeof(uint8_t)*2)+(sizeof(uint16_t)*2),joueur->port,4);
     memmove(buffer+SIZE_OF_HEAD+25+(sizeof(uint8_t)*2)+(sizeof(uint16_t)*2),END_TCP,SIZE_OF_END);
-    buffer[taille-1]='\0';
-    printf("%s\n",buffer);
     if(taille!=send(sock,buffer,taille,0)){
         printf("Coudln't send WELCO\n");
     }
     return NULL;
 }
-void* send_posit(int sock,joueur *joueur){
-    int taille =17+SIZE_OF_HEAD+SIZE_OF_END;
 
+void* send_posit(int sock, joueur *joueur){
+    int taille =SIZE_OF_HEAD+17+SIZE_OF_END;
+    char response[taille];
+    memmove(response,POSIT,SIZE_OF_HEAD);
+    sprintf(response+SIZE_OF_HEAD, " %s %d %d%s", joueur->id, joueur->x, joueur->y, END_TCP);
+    if(taille!=send(sock,response,taille,0)){
+        printf("Coudln't send WELCO\n");
+    }
     return NULL;
 }
 
