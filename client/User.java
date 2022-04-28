@@ -340,35 +340,50 @@ public class User {
                 byte[] request=s.getBytes();
                 this.ot.write(request);
                 this.ot.flush();
-                //response
-                byte[] response=readFirstMessage(in);
-                String responseString=new String(response, StandardCharsets.UTF_8);
-                //[WELCO m h w f ip port***]
-                if(responseString.startsWith("WELCOM ")){
-                    int idGame=response[6];
 
-                    byte[] arrb=new byte[2];
-                    System.arraycopy(response, 8, arrb, 0, 2);
-                    int heightMap=ByteBuffer.wrap(converting(arrb)).getChar();
+                byte[] response;
+                String responseString;
+
+                while (true){
+                    //TODO: bon?
+                    //pour ne pas saturer le processeur
+                    try{Thread.sleep(1);}catch (InterruptedException ignored){}
+
+                    //response
+                    response=readFirstMessage(in);
+                    responseString=new String(response, StandardCharsets.UTF_8);
+
+                    //[WELCO m h w f ip port***]
+                    if(responseString.startsWith("WELCO ")){
+                        int idGame=response[6];
+
+                        byte[] arrb=new byte[2];
+                        System.arraycopy(response, 8, arrb, 0, 2);
+                        int heightMap=ByteBuffer.wrap(converting(arrb)).getChar();
 
 
-                    System.arraycopy(response, 11, arrb, 0, 2);
-                    int widthMap=ByteBuffer.wrap(converting(arrb)).getChar();
+                        System.arraycopy(response, 11, arrb, 0, 2);
+                        int widthMap=ByteBuffer.wrap(converting(arrb)).getChar();
 
-                    int nbrGhost=response[14];
+                        int nbrGhost=response[14];
 
-                    byte[] ipb=new byte[15];
-                    System.arraycopy(response, 16, ipb, 0, 15);
-                    String ipMultiDiff=new String(ipb, StandardCharsets.UTF_8);
+                        byte[] ipb=new byte[15];
+                        System.arraycopy(response, 16, ipb, 0, 15);
+                        String ipMultiDiff=new String(ipb, StandardCharsets.UTF_8);
 
-                    byte[] portb=new byte[4];
-                    System.arraycopy(response, 32, portb, 0, 4);
-                    int portMultiDiff=Integer.parseInt(new String(portb, StandardCharsets.UTF_8));
+                        byte[] portb=new byte[4];
+                        System.arraycopy(response, 32, portb, 0, 4);
+                        int portMultiDiff=ByteBuffer.wrap(converting(portb)).getChar();
 
-                    System.out.println("La partie "+idGame+" a pour hauteur "+heightMap+", largeur "+widthMap+", nombre de phantomes "+nbrGhost+", adresse ip de multidiffusion "+ipMultiDiff+" et port de multi diffusion"+portMultiDiff);
-                    return true;
+                        System.out.println("La partie "+idGame+" a pour hauteur "+heightMap+", largeur "+widthMap+", nombre de fantomes "+nbrGhost+", adresse ip de multidiffusion "+ipMultiDiff+" et port de multi diffusion "+portMultiDiff);
+                        break;
+                    }
                 }
-                //TODO: changer position?
+
+                //response
+                response=readFirstMessage(in);
+                responseString=new String(response, StandardCharsets.UTF_8);
+
                 //[POSIT id x y***]
                 if(responseString.startsWith("POSIT ")){
 
