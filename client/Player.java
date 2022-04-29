@@ -1,13 +1,11 @@
 package client;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
 public class Player {
 
-    public Player(int UDPClient){
+    public Player(int UDPClient) {
         (new ConnectServerUDP("", UDPClient)).run();
     }
 
@@ -16,9 +14,9 @@ public class Player {
         private final String hostName;
         private final int port;
 
-        public ConnectServerUDP(String hostName, int port){
-            this.port=port;
-            this.hostName=hostName;
+        public ConnectServerUDP(String hostName, int port) {
+            this.port = port;
+            this.hostName = hostName;
         }
 
         @Override
