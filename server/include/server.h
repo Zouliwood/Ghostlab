@@ -34,6 +34,7 @@
 #define MOVEF "MOVEF"
 #define WELCO "WELCO"
 #define POSIT "POSIT"
+#define GOBYE "GOBYE"
 // commandes client
 #define NEWPL "NEWPL"
 #define REGIS "REGIS"

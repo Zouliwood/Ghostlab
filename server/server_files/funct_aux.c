@@ -1,7 +1,7 @@
 #include "funct_aux.h"
 #include "entity_position.h"
 
-void *func_send_games(int sock2, listElements *games)
+void func_send_games(int sock2, listElements *games)
 {
     int size_games = sizeof(uint8_t) + SIZE_OF_HEAD + SIZE_OF_END + 1;
     char games_mess[size_games];
@@ -34,7 +34,6 @@ void *func_send_games(int sock2, listElements *games)
         }
         ptr = ptr->next;
     }
-    return NULL;
 }
 
 joueur *new_game(int sock2, listElements *games)
@@ -168,13 +167,12 @@ joueur *register_game(int sock2, listElements *games)
     if ((taille) != send(sock2, message, taille, 0))
     {
         printf("couldn't send regok");
-
         return NULL;
     }
     return j1;
 }
 
-void *func_send_dunno(int sock2)
+void func_send_dunno(int sock2)
 {
     int taille = SIZE_OF_HEAD + SIZE_OF_END;
     char message[taille];
@@ -183,10 +181,9 @@ void *func_send_dunno(int sock2)
     int count = send(sock2, message, taille, 0);
     if (count != taille)
         printf("Couldn't send duno");
-    return NULL;
 }
 
-void *func_send_regno(int sock2)
+void func_send_regno(int sock2)
 {
     int taille = SIZE_OF_HEAD + SIZE_OF_END;
     char message[taille];
@@ -195,15 +192,13 @@ void *func_send_regno(int sock2)
     int count = send(sock2, message, taille, 0);
     if (count != taille)
         printf("Couldn't send regno");
-    return NULL;
 }
 
-void *start_game(joueur *joueur, int socket)
+void start_game(joueur *joueur, int socket)
 {
     if (joueur->current == NULL)
     {
         func_send_dunno(socket);
-        return NULL;
     }
     joueur->current->start += 1;
     init_pos_player(joueur, joueur->current);
@@ -211,10 +206,9 @@ void *start_game(joueur *joueur, int socket)
     {
         joueur->current->encours = 1;
     }
-    return NULL;
 }
 
-void *func_unreg(joueur *joueur, listElements *games, int sock)
+void* func_unreg(joueur *joueur, listElements *games, int sock)
 {
     // remove joueur from game and free mem
     uint8_t id = joueur->current->game_id;
@@ -252,7 +246,7 @@ void *func_unreg(joueur *joueur, listElements *games, int sock)
     return NULL;
 }
 
-void *send_list(int sock, game *game_current)
+void send_list(int sock, game *game_current)
 {
     int size_list = (sizeof(uint8_t) * 2) + SIZE_OF_HEAD + 2 + SIZE_OF_END;
     char games_mess[size_list];
@@ -279,10 +273,9 @@ void *send_list(int sock, game *game_current)
             printf("Couldn't send PLAYR %d\n", i);
         ptr = ptr->next;
     }
-    return NULL;
 }
 
-void *get_size_map(int sock, listElements *games)
+void get_size_map(int sock, listElements *games)
 {
     // [SIZE? m***]
     int taille = 1 + sizeof(uint8_t) + SIZE_OF_END;
@@ -290,7 +283,6 @@ void *get_size_map(int sock, listElements *games)
     if (taille != recv(sock, buffer, taille, 0))
     {
         func_send_dunno(sock);
-        return NULL;
     }
     uint8_t game_id = (uint8_t)buffer[1];
     game *el = get_game(games, game_id);
@@ -314,10 +306,9 @@ void *get_size_map(int sock, listElements *games)
         if (count != size)
             printf("Impossible d'envoyer la taille de la map");
     }
-    return NULL;
 }
 
-void *send_welco(int sock, joueur *joueur)
+void send_welco(int sock, joueur *joueur)
 {
     int taille = SIZE_OF_HEAD + SIZE_OF_END + 16 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2) + 4 + 5;
     char buffer[taille];
@@ -340,10 +331,9 @@ void *send_welco(int sock, joueur *joueur)
         printf("Coudln't send WELCO\n");
     }
     send_posit(sock, joueur);
-    return NULL;
 }
 
-void *send_posit(int sock, joueur *joueur)
+void send_posit(int sock, joueur *joueur)
 {
     int taille = SIZE_OF_HEAD + 17 + SIZE_OF_END;
     char response[taille];
@@ -353,10 +343,9 @@ void *send_posit(int sock, joueur *joueur)
     {
         printf("Coudln't send POSIT\n");
     }
-    return NULL;
 }
 
-void *movPlayer(int sock, int dir, joueur *joueur)
+void movPlayer(int sock, int dir, joueur *joueur)
 {
     game *game = joueur->current;
     int taille = 1 + 3 + SIZE_OF_END;
@@ -364,7 +353,6 @@ void *movPlayer(int sock, int dir, joueur *joueur)
     if (taille != recv(sock, buffer, taille, 0))
     {
         func_send_dunno(sock);
-        return NULL;
     }
 
     char endTCP[4];
@@ -373,7 +361,6 @@ void *movPlayer(int sock, int dir, joueur *joueur)
     if (strcmp(endTCP, END_TCP) != 0)
     {
         func_send_dunno(sock);
-        return NULL;
     }
 
     char distance[3];
@@ -403,24 +390,46 @@ void *movPlayer(int sock, int dir, joueur *joueur)
         printf("Coudln't send list!");
 }
 
-void quit_game(int sock,joueur* player)
+void quit_game(int sock, joueur *player, listElements *games)
 {
     // on vérifie que le protocole est respecté
-    int taille =SIZE_OF_END;
-    char buffer[taille+1];
+    int taille = SIZE_OF_END;
+    char buffer[taille + 1];
     if (taille != recv(sock, buffer, taille, 0))
     {
         func_send_dunno(sock);
-        return NULL;
     }
     buffer[3] = '\0';
     if (strcmp(buffer, END_TCP) != 0)
     {
         func_send_dunno(sock);
-        return NULL;
     }
     // execution du iquit
-    //TODO
-    return NULL;
+    if (player->current != NULL)
+    {
+        int joueurs_in_game = player->current->joueurs->count;
+        if (joueurs_in_game == 1)
+        {
+            removeEl(player->current->joueurs, player->current->joueurs->first);
+            freeGame(player->current);
+        }
+        else
+        {
+            element *ptr =player->current->joueurs->first;
+            for(int i = 0;i<joueurs_in_game;i++){
+                if(ptr->data==player)break;
+                else ptr=ptr->next;
+            }
+            removeEl(player->current->joueurs,ptr);
+        }
+    }
+    free(player);
 
+    // send goodbye
+    char goodbye[SIZE_OF_HEAD+SIZE_OF_END];
+    memmove(goodbye,GOBYE,SIZE_OF_HEAD);
+    memmove(goodbye+SIZE_OF_HEAD,END_TCP,SIZE_OF_END);
+    if(send(sock,goodbye,SIZE_OF_END+SIZE_OF_HEAD,0)){
+        printf("Couldn't send GOBYE\n");
+    }
 }

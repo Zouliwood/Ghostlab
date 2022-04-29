@@ -87,10 +87,6 @@ void *client_thread(void *socket)
             else
             {
                 me = func_unreg(me, games, sock2);
-                if (me == NULL)
-                {
-                    printf("ME is NULL \n");
-                }
             }
         }
         else if (strcmp(command, SIZEC) == 0)
@@ -166,6 +162,8 @@ void *client_thread(void *socket)
         }
         else if (strcmp(IQUIT, command) == 0)
         {
+            quit_game(sock2,me,games);
+            break;
         }
         else
         {
