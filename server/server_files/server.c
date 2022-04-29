@@ -139,10 +139,38 @@ void *client_thread(void *socket)
             printf("118 Dunno\n");
         }
     }
-
+    if (me->current->encours == 1)
+    {
+        send_welco(sock2, me);
+    }
     while (me->current->encours == 1)
     {
-        send_welco(sock2,me);
+        char command[SIZE_OF_HEAD + 1];
+        int count = recv(sock2, command, SIZE_OF_HEAD, 0);
+        command[count] = '\0';
+        if (strcmp(UPMOV, command) == 0)
+        {
+            movPlayer(sock2, 0, me);
+        }
+        else if (strcmp(DOMOV, command) == 0)
+        {
+            movPlayer(sock2, 2, me);
+        }
+        else if (strcmp(LEMOV, command) == 0)
+        {
+            movPlayer(sock2, 3, me);
+        }
+        else if (strcmp(RIMOV, command) == 0)
+        {
+            movPlayer(sock2, 1, me);
+        }
+        else if (strcmp(IQUIT, command) == 0)
+        {
+        }
+        else
+        {
+            func_send_dunno(sock2);
+        }
     }
     close(sock2);
     return NULL;

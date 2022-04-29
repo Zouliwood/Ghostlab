@@ -43,6 +43,10 @@
 #define SIZEC "SIZE?"
 #define LISTC "LIST?"
 #define GAMEC "GAME?"
+#define UPMOV "UPMOV"
+#define DOMOV "DOMOV"
+#define LEMOV "LEMOV"
+#define RIMOV "RIMOV"
 void *client_thread(void *socket);
 
 #endif
