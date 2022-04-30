@@ -274,8 +274,6 @@ class MessagePlayer {
                 throw new NullPointerException();
             String responseServeur = new String(response, StandardCharsets.UTF_8);
 
-            System.out.println("\n\n\n"+responseServeur+"\n\n\n");
-
             if (responseServeur.startsWith("GOBYE" + END_TCP)) {
                 System.out.println("Vous avez bien abandonné la partie.");
                 return true;

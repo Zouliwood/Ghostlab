@@ -163,9 +163,11 @@ public class User {
                                     if (direction.equals("DOMOV") || direction.equals("UPMOV") || direction.equals("RIMOV") || direction.equals("LEMOV")) {
                                         try {
                                             if (distance.length() != 3 || Integer.parseInt(distance) > 999 || Integer.parseInt(distance) < 0) {
+                                                flagerror = true;
+                                            } else {
                                                 flagerror = false;
                                                 flag = mp.goMove(direction, distance);
-                                            } else flagerror = true;
+                                            }
                                         } catch (NumberFormatException e) {
                                             flagerror = true;
                                         }
