@@ -136,7 +136,6 @@ void *client_thread(void *socket)
     while(me->current->encours==0);
     if (me->current->encours == 1)
     {
-        printf("WELCOME %s\n",me->id);
         send_welco(sock2, me);
     }
     while (me->current->encours == 1)

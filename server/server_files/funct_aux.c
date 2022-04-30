@@ -48,11 +48,9 @@ joueur *new_game(int sock2, listElements *games)
     }
     printf("creation du joueur\n");
     // création du joueur
-    printf("%c%c%c%c\n",buffer[10],buffer[11],buffer[12],buffer[13]);
     joueur *j1 = malloc(sizeof(joueur));
     memmove(j1->id, buffer + 1, 8);
     memmove(j1->port, buffer + 10, 4);
-    printf("%s\n",j1->port);
     j1->score = 0;
     j1->x = -1;
     j1->y = -1;
@@ -66,9 +64,15 @@ joueur *new_game(int sock2, listElements *games)
     struct in_addr temp;
     temp.s_addr = addr.sin_addr.s_addr;
     char *res = inet_ntoa(temp);
-    memset(j1->ip, '#', 15);
-    printf("%ld\n",strlen(res));
-    memmove(j1->ip, res, strlen(res));
+    if (res != NULL)
+    {
+        memset(j1->ip, '#', 15);
+        memmove(j1->ip, res, strlen(res));
+    }
+    else
+    {
+        printf("Error while getting ip");
+    }
 
     // création de la partie
     game *new = malloc(sizeof(game));
@@ -140,7 +144,7 @@ joueur *register_game(int sock2, listElements *games)
         printf("register taille != Dunno\n");
         return NULL;
     }
-    uint8_t id =*(uint8_t*)(buffer + 15);
+    uint8_t id = *(uint8_t *)(buffer + 15);
     game *_game = get_game(games, id);
     if (!_game)
     {
@@ -153,11 +157,10 @@ joueur *register_game(int sock2, listElements *games)
     joueur *j1 = malloc(sizeof(joueur));
     memmove(j1->id, buffer + 1, 8);
     memmove(j1->port, buffer + 10, 4);
-    printf("%s\n",j1->port);
     j1->score = 0;
     j1->x = -1;
     j1->y = -1;
-        // récuperation IP
+    // récuperation IP
     struct sockaddr_in addr;
     socklen_t addr_size = sizeof(struct sockaddr_in);
     if (getpeername(sock2, (struct sockaddr *)&addr, &addr_size) == -1)
@@ -167,8 +170,15 @@ joueur *register_game(int sock2, listElements *games)
     struct in_addr temp;
     temp.s_addr = addr.sin_addr.s_addr;
     char *res = inet_ntoa(temp);
-    memset(j1->ip, '#', 15);
-    memmove(j1->ip, res, strlen(res));
+    if (res != NULL)
+    {
+        memset(j1->ip, '#', 15);
+        memmove(j1->ip, res, strlen(res));
+    }
+    else
+    {
+        printf("Error while getting ip");
+    }
     addEl(_game->joueurs, _game->joueurs->last, j1);
     j1->current = _game;
 
@@ -222,7 +232,7 @@ void start_game(joueur *joueur, int socket)
     }
 }
 
-void* func_unreg(joueur *joueur, listElements *games, int sock)
+void *func_unreg(joueur *joueur, listElements *games, int sock)
 {
     // remove joueur from game and free mem
     uint8_t id = joueur->current->game_id;
@@ -322,48 +332,59 @@ void get_size_map(int sock, listElements *games)
     }
 }
 
-void send_welco(int sock, joueur *joueur)
+void send_welco(int sock, joueur *player)
 {
     int taille = SIZE_OF_HEAD + SIZE_OF_END + 16 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2) + 4 + 5;
     char welco_mess[taille];
-    printf("%s\n",joueur->ip);
-    printf("%d\n",joueur->current->heightMap);
-    printf("%d\n",joueur->current->widthMap);
-    printf("%d\n",joueur->current->fantomes->count);
-    memmove(welco_mess, WELCO, SIZE_OF_HEAD);
-    memmove(welco_mess + SIZE_OF_HEAD, " ", 1);
-    memmove(welco_mess + SIZE_OF_HEAD + 1, &joueur->current->game_id, sizeof(uint8_t));
-    memmove(welco_mess + SIZE_OF_HEAD + 1 + sizeof(uint8_t), " ", 1);
-    memmove(welco_mess + SIZE_OF_HEAD + 2 + sizeof(uint8_t), &joueur->current->heightMap, sizeof(uint16_t));
-    memmove(welco_mess + SIZE_OF_HEAD + 2 + sizeof(uint8_t) + sizeof(uint16_t), " ", 1);
-    memmove(welco_mess + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + sizeof(uint16_t), &joueur->current->widthMap, sizeof(uint16_t));
-    memmove(welco_mess + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + (sizeof(uint16_t) * 2), " ", 1);
-    memmove(welco_mess + SIZE_OF_HEAD + 4 + sizeof(uint8_t) + (sizeof(uint16_t) * 2), &joueur->current->fantomes->count, sizeof(uint8_t));
-    memmove(welco_mess + SIZE_OF_HEAD + 4 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), " ", 1);
-    memmove(welco_mess + SIZE_OF_HEAD + 5 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), joueur->ip, 15);
-    memmove(welco_mess + SIZE_OF_HEAD + 20 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), " ", 1);
-    memmove(welco_mess + SIZE_OF_HEAD + 21 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), joueur->port, 4);
-    memmove(welco_mess + SIZE_OF_HEAD + 25 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), END_TCP, SIZE_OF_END);
-    if (taille != send(sock, welco_mess, taille, 0))
+    if (player == NULL || player->ip == NULL || player->id == NULL || player->port == NULL)
     {
-        printf("Coudln't send WELCO\n");
+        printf("Error wrong value for joueurs");
     }
-    send_posit(sock, joueur);
+    else
+    {
+        memmove(welco_mess, WELCO, SIZE_OF_HEAD);
+        memmove(welco_mess + SIZE_OF_HEAD, " ", 1);
+        memmove(welco_mess + SIZE_OF_HEAD + 1, &player->current->game_id, sizeof(uint8_t));
+        memmove(welco_mess + SIZE_OF_HEAD + 1 + sizeof(uint8_t), " ", 1);
+        memmove(welco_mess + SIZE_OF_HEAD + 2 + sizeof(uint8_t), &player->current->heightMap, sizeof(uint16_t));
+        memmove(welco_mess + SIZE_OF_HEAD + 2 + sizeof(uint8_t) + sizeof(uint16_t), " ", 1);
+        memmove(welco_mess + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + sizeof(uint16_t), &player->current->widthMap, sizeof(uint16_t));
+        memmove(welco_mess + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + (sizeof(uint16_t) * 2), " ", 1);
+        memmove(welco_mess + SIZE_OF_HEAD + 4 + sizeof(uint8_t) + (sizeof(uint16_t) * 2), &player->current->fantomes->count, sizeof(uint8_t));
+        memmove(welco_mess + SIZE_OF_HEAD + 4 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), " ", 1);
+        memmove(welco_mess + SIZE_OF_HEAD + 5 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), player->ip, 15);
+        memmove(welco_mess + SIZE_OF_HEAD + 20 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), " ", 1);
+        memmove(welco_mess + SIZE_OF_HEAD + 21 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), player->port, 4);
+        memmove(welco_mess + SIZE_OF_HEAD + 25 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), END_TCP, SIZE_OF_END);
+        if (taille != send(sock, welco_mess, taille, 0))
+        {
+            printf("Coudln't send WELCO\n");
+        }
+        send_posit(sock, player);
+    }
 }
 
 void send_posit(int sock, joueur *joueur)
 {
     int taille = SIZE_OF_HEAD + 17 + SIZE_OF_END;
-    char response[taille];
-    memmove(response, POSIT, SIZE_OF_HEAD);
-    sprintf(response + SIZE_OF_HEAD, " %s %d %d%s", joueur->id, joueur->x, joueur->y, END_TCP);
-    if (taille != send(sock, response, taille, 0))
+    char reponse[taille+1];
+    memmove(reponse, POSIT, SIZE_OF_HEAD);
+    memmove(reponse+SIZE_OF_HEAD," ",1);
+    memmove(reponse+SIZE_OF_HEAD+1,joueur->id,8);
+    memmove(reponse+SIZE_OF_HEAD+9," ",1);
+    sprintf(reponse + SIZE_OF_HEAD+10, "%03d",joueur->x);
+    memmove(reponse+SIZE_OF_HEAD+13," ",1);
+    sprintf(reponse+SIZE_OF_HEAD+14,"%03d",joueur->y);
+    memmove(reponse+SIZE_OF_HEAD+17,END_TCP,SIZE_OF_END);
+    reponse[taille]='\0';
+    printf("%s\n",reponse);
+    if (taille != send(sock, reponse, taille, 0))
     {
         printf("Coudln't send POSIT\n");
     }
 }
 
-void movPlayer(int sock, int dir, joueur *joueur,listElements *games)
+void movPlayer(int sock, int dir, joueur *joueur, listElements *games)
 {
     game *game = joueur->current;
     int taille = 1 + 3 + SIZE_OF_END;
@@ -406,11 +427,12 @@ void movPlayer(int sock, int dir, joueur *joueur,listElements *games)
     memmove(games_mess + SIZE_OF_HEAD + 8, END_TCP, SIZE_OF_END);
     if (size_list != send(sock, games_mess, size_list, 0))
         printf("Coudln't send list!");
-    if(game->fantomes->count==0)
+    if (game->fantomes->count == 0)
     {
         // TODO traiter fin de la game
     }
-    else movGhost(game);
+    else
+        movGhost(game);
 }
 
 void quit_game(int sock, joueur *player, listElements *games)
@@ -438,29 +460,33 @@ void quit_game(int sock, joueur *player, listElements *games)
         }
         else
         {
-            element *ptr =player->current->joueurs->first;
-            for(int i = 0;i<joueurs_in_game;i++){
-                if(ptr->data==player)break;
-                else ptr=ptr->next;
+            element *ptr = player->current->joueurs->first;
+            for (int i = 0; i < joueurs_in_game; i++)
+            {
+                if (ptr->data == player)
+                    break;
+                else
+                    ptr = ptr->next;
             }
-            removeEl(player->current->joueurs,ptr);
+            removeEl(player->current->joueurs, ptr);
         }
     }
     free(player);
 
     // send goodbye
-    char goodbye[SIZE_OF_HEAD+SIZE_OF_END];
-    memmove(goodbye,GOBYE,SIZE_OF_HEAD);
-    memmove(goodbye+SIZE_OF_HEAD,END_TCP,SIZE_OF_END);
-    if(send(sock,goodbye,SIZE_OF_END+SIZE_OF_HEAD,0)){
+    char goodbye[SIZE_OF_HEAD + SIZE_OF_END];
+    memmove(goodbye, GOBYE, SIZE_OF_HEAD);
+    memmove(goodbye + SIZE_OF_HEAD, END_TCP, SIZE_OF_END);
+    if (send(sock, goodbye, SIZE_OF_END + SIZE_OF_HEAD, 0))
+    {
         printf("Couldn't send GOBYE\n");
     }
 }
 
-void send_glis(int sock,joueur *player)
+void send_glis(int sock, joueur *player)
 {
-    game *game_current=player->current;
-    int taille =SIZE_OF_HEAD + 1 + SIZE_OF_END+ sizeof(uint8_t);
+    game *game_current = player->current;
+    int taille = SIZE_OF_HEAD + 1 + SIZE_OF_END + sizeof(uint8_t);
     char glis_mess[taille];
     memmove(glis_mess, LISTS, SIZE_OF_HEAD);
     memmove(glis_mess + SIZE_OF_HEAD, " ", 1);
@@ -471,15 +497,15 @@ void send_glis(int sock,joueur *player)
     element *ptr = game_current->joueurs->first;
     for (int i = 0; i < game_current->joueurs->count; i++)
     {
-        taille = SIZE_OF_HEAD +4+8+4+3+3+SIZE_OF_END;
-        //port+id+_+x+Y
+        taille = SIZE_OF_HEAD + 4 + 8 + 4 + 3 + 3 + SIZE_OF_END;
+        // port+id+_+x+Y
         char gplyr_mess[taille];
         memmove(gplyr_mess, GPLYR, SIZE_OF_HEAD);
         memmove(gplyr_mess + SIZE_OF_HEAD, " ", 1);
         memmove(gplyr_mess + SIZE_OF_HEAD + 1, &(((joueur *)ptr->data)->id), 8);
-        sprintf(gplyr_mess + SIZE_OF_HEAD + 9," %03d %03d ",((joueur *)ptr->data)->x,((joueur *)ptr->data)->y);
+        sprintf(gplyr_mess + SIZE_OF_HEAD + 9, " %03d %03d ", ((joueur *)ptr->data)->x, ((joueur *)ptr->data)->y);
         memmove(gplyr_mess + SIZE_OF_HEAD + 18, ((joueur *)ptr->data)->port, 4);
-        memmove(gplyr_mess + SIZE_OF_HEAD + 22,END_TCP,SIZE_OF_END);
+        memmove(gplyr_mess + SIZE_OF_HEAD + 22, END_TCP, SIZE_OF_END);
         if (taille != send(sock, gplyr_mess, taille, 0))
             printf("Couldn't send GPLYR %d\n", i);
         ptr = ptr->next;
