@@ -388,6 +388,7 @@ void movPlayer(int sock, int dir, joueur *joueur)
     memmove(games_mess + SIZE_OF_HEAD + 8, END_TCP, SIZE_OF_END);
     if (size_list != send(sock, games_mess, size_list, 0))
         printf("Coudln't send list!");
+    movGhost(game);
 }
 
 void quit_game(int sock, joueur *player, listElements *games)
