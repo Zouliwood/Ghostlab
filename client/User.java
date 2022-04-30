@@ -56,18 +56,20 @@ public class User {
 
                 mp.initPlayer();
 
-                int clientUDP = 0;
-                while (clientUDP < 1000 || clientUDP > 9999) {
+
+                //TODO: ici***
+                String clientUDP = "-1";
+                while (Integer.parseInt(clientUDP)>9999 || Integer.parseInt(clientUDP)<0) {
                     System.out.println("Veuillez saisir votre port (4 chiffres):");
                     try {
-                        clientUDP = new Scanner(System.in).nextInt();
+                        clientUDP = new Scanner(System.in).nextLine();
                     } catch (InputMismatchException e) {
-                        clientUDP = -1;
+                        clientUDP = "-1";
                     }
                 }
 
                 //TODO: all thread
-                Player p = new Player(clientUDP);
+                Player p = new Player(Integer.parseInt(clientUDP));
 
                 //user information has been registered correctly
                 User.status = 1;
@@ -149,7 +151,7 @@ public class User {
                                 }
                             }
                             if (gameActn == 0) flag = mp.quitGame();
-                            else if (gameActn == 1) flag = mp.listPlayerInGame(ot, in, idGame);//TODO: changer de commande
+                            else if (gameActn == 1) flag = mp.listPlayerInGame(ot, in);
                             else if (gameActn == 4) {
                                 boolean flagerror;
                                 flag = false;
@@ -192,7 +194,7 @@ public class User {
                     }
                 }
             } catch (Exception e) {
-                System.out.println(e);
+                System.out.println("Status Joueur: "+e);
                 e.printStackTrace();
             }
         }
