@@ -172,7 +172,15 @@ void *client_thread(void *socket)
         }
         else if (strcmp(GLISC, command) == 0)
         {
-            send_glis(sock2,me);
+            char end[SIZE_OF_END+1];
+            int r = recv(sock2, end, SIZE_OF_END, 0);
+            end[r]='\0';
+            if (r != SIZE_OF_END || strcmp(end,END_TCP)!=0)
+            {
+                func_send_dunno(sock2);
+                printf("75 Dunno\n");
+            }
+            else send_glis(sock2,me);
         }
         else if (strcmp(MALLC, command) == 0)
         {

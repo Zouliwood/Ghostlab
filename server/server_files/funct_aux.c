@@ -222,8 +222,9 @@ void start_game(joueur *joueur, int socket)
 {
     char end_start[4];
     int count = recv(socket, end_start, SIZE_OF_END, 0);
-    end_start[count]='\0';
-    if(strcmp(end_start,END_TCP)!=0){
+    end_start[count] = '\0';
+    if (strcmp(end_start, END_TCP) != 0)
+    {
         func_send_dunno(socket);
         printf("Wrong input for start");
     }
@@ -498,7 +499,7 @@ void send_glis(int sock, joueur *player)
     game *game_current = player->current;
     int taille = SIZE_OF_HEAD + 1 + SIZE_OF_END + sizeof(uint8_t);
     char glis_mess[taille];
-    memmove(glis_mess, LISTS, SIZE_OF_HEAD);
+    memmove(glis_mess, GLISS, SIZE_OF_HEAD);
     memmove(glis_mess + SIZE_OF_HEAD, " ", 1);
     memmove(glis_mess + SIZE_OF_HEAD + 1, &(game_current->joueurs->count), sizeof(uint8_t));
     memmove(glis_mess + SIZE_OF_HEAD + 1 + sizeof(uint8_t), END_TCP, SIZE_OF_END);
@@ -513,7 +514,11 @@ void send_glis(int sock, joueur *player)
         memmove(gplyr_mess, GPLYR, SIZE_OF_HEAD);
         memmove(gplyr_mess + SIZE_OF_HEAD, " ", 1);
         memmove(gplyr_mess + SIZE_OF_HEAD + 1, &(((joueur *)ptr->data)->id), 8);
-        sprintf(gplyr_mess + SIZE_OF_HEAD + 9, " %03d %03d ", ((joueur *)ptr->data)->x, ((joueur *)ptr->data)->y);
+        memmove(gplyr_mess + SIZE_OF_HEAD + 9, " ", 1);
+        sprintf(gplyr_mess + SIZE_OF_HEAD + 10, "%03d", ((joueur *)ptr->data)->x);
+        memmove(gplyr_mess + SIZE_OF_HEAD + 13, " ", 1);
+        sprintf(gplyr_mess + SIZE_OF_HEAD + 14, "%03d", ((joueur *)ptr->data)->y);
+        memmove(gplyr_mess + SIZE_OF_HEAD + 17, " ", 1);
         memmove(gplyr_mess + SIZE_OF_HEAD + 18, ((joueur *)ptr->data)->port, 4);
         memmove(gplyr_mess + SIZE_OF_HEAD + 22, END_TCP, SIZE_OF_END);
         if (taille != send(sock, gplyr_mess, taille, 0))

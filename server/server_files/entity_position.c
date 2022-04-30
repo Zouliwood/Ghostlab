@@ -97,7 +97,6 @@ void init_pos_player(joueur* player, game *game){
         el=el->next;
     }
     //pthread_mutex_unlock(&verrou);
-
 }
 
 void no_collision(void (*mov)(fantome* fantome,game *game), fantome* fantom, game *game){
