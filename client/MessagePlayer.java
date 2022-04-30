@@ -32,6 +32,7 @@ class MessagePlayer {
             //response
             int idGame, hGame, wGame;
             byte[] response = readFirstMessage(in);
+            if (response==null)throw new NullPointerException();
             String responseString = new String(response, StandardCharsets.UTF_8);
             //[SIZE! m h w***]
             if (responseString.startsWith("SIZE! ")) {
@@ -47,6 +48,9 @@ class MessagePlayer {
 
                 System.out.println("La map " + idGame + " est de hauter " + hGame + " et de largeur " + wGame);
             } else System.out.println(Error.requestClient);
+        } catch (NullPointerException e){
+            System.out.println(Error.responseServ);
+            e.printStackTrace();
         } catch (IndexOutOfBoundsException e) {
             System.out.println(Error.nbrArgs);
             e.printStackTrace();
@@ -57,7 +61,7 @@ class MessagePlayer {
     }
 
     //[LIST? m***] this.in && Player.this.in
-    public boolean listPlayer(DataOutputStream ot, DataInputStream in, int idMap) {
+    public void listPlayer(DataOutputStream ot, DataInputStream in, int idMap) {
         try {
             //request
             inRangeUint8(idMap);
@@ -69,6 +73,7 @@ class MessagePlayer {
             //response
             int idGame, nbrPlayers;
             byte[] response = readFirstMessage(in);
+            if (response==null)throw new NullPointerException();
             String responseString = new String(response, StandardCharsets.UTF_8);
             if (responseString.startsWith("LIST! ")) {
                 idGame = response[6];
@@ -85,10 +90,10 @@ class MessagePlayer {
                         System.out.println("Le joueur: " + new String(idPlayerb, StandardCharsets.UTF_8));
                     }
                 }
-            } else if (responseString.equals("GOBYE" + END_TCP)) {
-                System.out.println("La partie est terminé");
-                return true;
             } else System.out.println(Error.requestClient);
+        } catch (NullPointerException e){
+            System.out.println(Error.responseServ);
+            e.printStackTrace();
         } catch (IndexOutOfBoundsException e) {
             System.out.println(Error.nbrArgs);
             e.printStackTrace();
@@ -96,7 +101,6 @@ class MessagePlayer {
             System.out.println(Error.requestServ);
             e.printStackTrace();
         }
-        return false;
     }
 
     //[GAME?***]
@@ -110,6 +114,7 @@ class MessagePlayer {
             //response
             int nbrGames;
             byte[] response = readFirstMessage(in);
+            if (response==null)throw new NullPointerException();
             String responseSting = new String(response, StandardCharsets.UTF_8);
             if (responseSting.startsWith("GAMES ")) {
                 nbrGames = response[6];
@@ -125,6 +130,9 @@ class MessagePlayer {
                     } else System.out.println(Error.responseServ);
                 }
             } else System.out.println(Error.responseServ);
+        } catch (NullPointerException e){
+            System.out.println(Error.responseServ);
+            e.printStackTrace();
         } catch (IOException e) {
             System.out.println(Error.nbrArgs);
             e.printStackTrace();
@@ -155,6 +163,7 @@ class MessagePlayer {
 
                 //response
                 response = readFirstMessage(in);
+                if (response==null)throw new NullPointerException();
                 responseString = new String(response, StandardCharsets.UTF_8);
 
                 //[WELCO m h w f ip port***]
@@ -186,6 +195,7 @@ class MessagePlayer {
 
             //response
             response = readFirstMessage(in);
+            if (response==null)throw new NullPointerException();
             responseString = new String(response, StandardCharsets.UTF_8);
 
             //[POSIT id x y***]
@@ -205,6 +215,9 @@ class MessagePlayer {
                 System.out.println("Joueur: " + idPlayer + " a pour position x: " + corrX + " et pour position y:" + corrY);
                 return true;
             } else System.out.println(Error.requestClient);
+        } catch (NullPointerException e){
+            System.out.println(Error.responseServ);
+            e.printStackTrace();
         } catch (IOException e) {
             System.out.println(Error.requestServ);
             e.printStackTrace();
@@ -223,13 +236,16 @@ class MessagePlayer {
             //response
             int idGame;
             byte[] response = readFirstMessage(in);
-
+            if (response==null)throw new NullPointerException();
             String responseString = new String(response, StandardCharsets.UTF_8);
             if (responseString.startsWith("UNROK ")) {
                 idGame = response[6];
                 System.out.println("Vous avez bien été désincrit de la partie: " + idGame);
                 return true;
             } else System.out.println(Error.requestClient);
+        } catch (NullPointerException e){
+            System.out.println(Error.responseServ);
+            e.printStackTrace();
         } catch (IOException e) {
             System.out.println(Error.requestServ);
             e.printStackTrace();
@@ -245,11 +261,15 @@ class MessagePlayer {
             this.ot.write(request);
             this.ot.flush();
             byte[] response = readFirstMessage(this.in);
+            if (response==null)throw new NullPointerException();
             String responseServeur = new String(response, StandardCharsets.UTF_8);
             if (responseServeur.equals("GOBYE" + END_TCP)) {
                 System.out.println("Vous avez bien abandonné la partie.");
                 return true;
             } else System.out.println(Error.requestClient);
+        } catch (NullPointerException e){
+            System.out.println(Error.responseServ);
+            e.printStackTrace();
         } catch (IOException e) {
             System.out.println(Error.requestServ);
             e.printStackTrace();
@@ -269,12 +289,16 @@ class MessagePlayer {
             this.ot.flush();
             //response
             byte[] response = readFirstMessage(this.in);
+            if (response==null)throw new NullPointerException();
             String responseString = new String(response, StandardCharsets.UTF_8);
             if (responseString.equals("MAIL!" + END_TCP)) System.out.print("Le message a bien été envoyé");
             else if (responseString.equals("GOBYE" + END_TCP)) {
                 System.out.println("La partie est terminé");
                 return true;
             } else System.out.println(Error.requestClient);
+        } catch (NullPointerException e){
+            System.out.println(Error.responseServ);
+            e.printStackTrace();
         } catch (IOException e) {
             System.out.println(Error.responseServ);
         }
@@ -289,6 +313,7 @@ class MessagePlayer {
             this.ot.write(request);
             this.ot.flush();
             byte[] response = readFirstMessage(this.in);
+            if (response==null)throw new NullPointerException();
             String responseString = new String(response, StandardCharsets.UTF_8);
             switch (responseString) {
                 case "SEND!" + END_TCP: {
@@ -307,6 +332,9 @@ class MessagePlayer {
                     System.out.println(Error.requestClient);
                 }
             }
+        } catch (NullPointerException e){
+            System.out.println(Error.responseServ);
+            e.printStackTrace();
         } catch (IOException e) {
             System.out.println(Error.responseServ);
         }
@@ -321,16 +349,40 @@ class MessagePlayer {
             //request
             requestServMov(move, nbrCase);
             //response
-            return responseServMov();
-        } catch (IndexOutOfBoundsException e) {
-            System.out.println(Error.nbrArgs);
+            byte[] response = readFirstMessage(MessagePlayer.this.in);
+            if (response==null)throw new NullPointerException();
+            String responseString = new String(response, StandardCharsets.UTF_8);
+            if (responseString.startsWith("MOVE!") || responseString.startsWith("MOVEF")) {
+
+                byte[] coordb = new byte[3];
+                System.arraycopy(response, 6, coordb, 0, 3);
+                int coordX = Integer.parseInt(new String(coordb, StandardCharsets.UTF_8));
+
+                System.arraycopy(response, 10, coordb, 0, 3);
+                int coordY = Integer.parseInt(new String(coordb, StandardCharsets.UTF_8));
+
+                byte[] nbrPts = new byte[4];
+                System.arraycopy(response, 14, nbrPts, 0, 4);
+                int nbrPtsPlayer = Integer.parseInt(new String(nbrPts, StandardCharsets.UTF_8));
+
+                if (responseString.startsWith("MOVEF")) {
+                    System.out.println("Vos nouvelles coordonées sont: (" + coordX + "," + coordY + ") " + " votre nouveau score est de " + nbrPtsPlayer);
+                } else System.out.println("Vos nouvelles coordonées sont: (" + coordX + "," + coordY + ")");
+            } else if (responseString.startsWith("GOBYE")) {
+                System.out.println("La partie est terminé");
+                return true;
+            } else System.out.println(Error.requestClient);
+            return false;
+        } catch (NullPointerException e){
+            System.out.println(Error.responseServ);
+            e.printStackTrace();
         }
         return false;
     }
 
     public void initPlayer() throws IOException {
         //[GAME n***]
-        int nbrPlayersWaiting = 0;
+        int nbrPlayersWaiting;
         if (readInput(in, 6).equals("GAMES ")) {
             nbrPlayersWaiting = in.readUnsignedByte() & 0xFF;
             System.out.format("Il y a %d parties en attente.\n", nbrPlayersWaiting);
@@ -362,18 +414,19 @@ class MessagePlayer {
     }
 
     //[NEWPL id port***]
-    public boolean createGame(int UDPPlayer) {
+    public boolean createGame(String UDPPlayer) {
         try {
             //request
             String s = "NEWPL " + this.pseudoClient + " port" + END_TCP;
             byte[] request = s.getBytes();
-            byte[] udpplayer = ByteBuffer.allocate(4).putInt(UDPPlayer).array();
+            byte[] udpplayer = UDPPlayer.getBytes();
             System.arraycopy(udpplayer, 0, request, 15, 4);
             this.ot.write(request);
             this.ot.flush();
             //response
             int idGame;
             byte[] response = readFirstMessage(this.in);
+            if (response==null)throw new NullPointerException();
             String responseString = new String(response, StandardCharsets.UTF_8);
             if (responseString.startsWith("REGOK")) {
                 idGame = response[6];
@@ -381,6 +434,9 @@ class MessagePlayer {
                 return true;
             } else if (responseString.startsWith("REGNO")) System.out.println("La partie n'a pas pu être créé");
             else System.out.println(Error.responseServ);
+        } catch (NullPointerException e){
+            System.out.println(Error.responseServ);
+            e.printStackTrace();
         } catch (IndexOutOfBoundsException e) {
             System.out.println(Error.valueInt);
             e.printStackTrace();
@@ -392,20 +448,21 @@ class MessagePlayer {
     }
 
     //[REGIS id port m***]
-    public boolean joinGame(int UDPPlayer, int idGame) {
+    public boolean joinGame(String UDPPlayer, int idGame) {
         try {
             //request
             String s = "REGIS " + this.pseudoClient + " port m" + END_TCP;
             byte[] request = s.getBytes();
             inRangeUint8(idGame);
             request[20] = (byte) idGame;
-            byte[] udpplayer = ByteBuffer.allocate(4).putInt(UDPPlayer).array();
+            byte[] udpplayer = UDPPlayer.getBytes();
             System.arraycopy(udpplayer, 0, request, 15, 4);
             this.ot.write(request);
             this.ot.flush();
             //response
             int idGameJ;
             byte[] response = readFirstMessage(this.in);
+            if (response==null)throw new NullPointerException();
             String responseString = new String(response, StandardCharsets.UTF_8);
             if (responseString.startsWith("REGOK")) {
                 idGameJ = response[6];
@@ -413,12 +470,66 @@ class MessagePlayer {
                 return true;
             } else if (responseString.startsWith("REGNO")) System.out.println("Vous n'avez pas pu rejoindre la partie");
             else System.out.println(Error.responseServ);
+        } catch (NullPointerException e){
+            System.out.println(Error.responseServ);
+            e.printStackTrace();
         } catch (IndexOutOfBoundsException e) {
             System.out.println(Error.valueInt);
             e.printStackTrace();
         } catch (IOException e) {
             System.out.println(Error.requestServ);
             e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean listPlayerInGame(DataOutputStream ot, DataInputStream in) {
+        try{
+            String messageString="GLIS?"+END_TCP;
+            byte[] request=messageString.getBytes();
+            ot.write(request);
+            ot.flush();
+
+            //response
+            int nbrJoueur;
+            byte[] response = readFirstMessage(in);
+            if (response==null)throw new NullPointerException();
+            String responseString = new String(response, StandardCharsets.UTF_8);
+            //[SIZE! m h w***]
+            if (responseString.startsWith("GLIS! ")) {
+                nbrJoueur = response[6];
+                for (int i = 0; i < nbrJoueur; i++) {
+                    response = readMessage(in);
+                    responseString = new String(response, StandardCharsets.UTF_8);
+
+                    if (responseString.startsWith("GPYLR ")){
+                        byte[] arrIdb = new byte[27];
+                        System.arraycopy(response, 6, arrIdb, 0, 8);
+                        String idPlayer = new String(arrIdb, StandardCharsets.UTF_8);
+
+                        byte[] corrdb = new byte[3];
+                        System.arraycopy(response, 15, arrIdb, 0, 3);
+                        int corrX = Integer.parseInt(new String(corrdb, StandardCharsets.UTF_8));
+
+                        System.arraycopy(response, 19, arrIdb, 0, 3);
+                        int corrY = Integer.parseInt(new String(corrdb, StandardCharsets.UTF_8));
+
+                        byte[] ptsJoueur = new byte[4];
+                        System.arraycopy(response, 23, arrIdb, 0, 4);
+                        int pts = Integer.parseInt(new String(ptsJoueur, StandardCharsets.UTF_8));
+
+                        System.out.println("Le joueur " + idPlayer + " en position (" + corrX + "," + corrY + ") a " + pts + " points.");
+                    }else System.out.println(Error.responseServ);
+                }
+            } else if (responseString.equals("GOBYE" + END_TCP)) {
+                System.out.println("La partie est terminé");
+                return true;
+            } else System.out.println(Error.requestClient);
+        } catch (NullPointerException e){
+            System.out.println(Error.responseServ);
+            e.printStackTrace();
+        } catch (IOException e){
+            System.out.println(Error.requestServ);
         }
         return false;
     }
@@ -475,46 +586,15 @@ class MessagePlayer {
         }
     }
 
-    private boolean responseServMov() {
-        byte[] response = readFirstMessage(MessagePlayer.this.in);
-        String responseString = new String(response, StandardCharsets.UTF_8);
-        if (responseString.startsWith("MOVE!") || responseString.startsWith("MOVEF")) {
-
-            byte[] coordb = new byte[3];
-            System.arraycopy(response, 6, coordb, 0, 3);
-            int coordX = Integer.parseInt(new String(coordb, StandardCharsets.UTF_8));
-
-            System.arraycopy(response, 10, coordb, 0, 3);
-            int coordY = Integer.parseInt(new String(coordb, StandardCharsets.UTF_8));
-
-            byte[] nbrPts = new byte[4];
-            System.arraycopy(response, 14, nbrPts, 0, 4);
-            int nbrPtsPlayer = Integer.parseInt(new String(nbrPts, StandardCharsets.UTF_8));
-
-            if (responseString.startsWith("MOVEF")) {
-                System.out.println("Vos nouvelles coordonées sont: (" + coordX + "," + coordY + ") " + " votre nouveau score est de " + nbrPtsPlayer);
-            } else System.out.println("Vos nouvelles coordonées sont: (" + coordX + "," + coordY + ")");
-        } else if (responseString.startsWith("GOBYE")) {
-            System.out.println("La partie est terminé");
-            return true;
-        } else System.out.println(Error.requestClient);
-        return false;
-    }
-
     private String readInput(DataInputStream in, int size) throws IOException {
+        //request
         byte[] input_header = new byte[size];
         int result = in.read(input_header, 0, size);
         if (result == -1) {
             System.out.println(Error.responseServ);
             throw new IOException();
         }
+        //response
         return new String(input_header, StandardCharsets.UTF_8);
-    }
-
-    public boolean listPlayerInGame(DataOutputStream ot, DataInputStream in, int idGame) {
-        //TODO:
-        /*String messageString="GLIS?"+END_TCP;
-        byte[] message=*/
-        return listPlayer(ot, in, idGame);
     }
 }
