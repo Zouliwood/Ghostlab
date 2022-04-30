@@ -273,11 +273,13 @@ class MessagePlayer {
             if (response == null)
                 throw new NullPointerException();
             String responseServeur = new String(response, StandardCharsets.UTF_8);
-            if (responseServeur.equals("GOBYE" + END_TCP)) {
+
+            System.out.println("\n\n\n"+responseServeur+"\n\n\n");
+
+            if (responseServeur.startsWith("GOBYE" + END_TCP)) {
                 System.out.println("Vous avez bien abandonné la partie.");
                 return true;
-            } else
-                System.out.println(Error.requestClient);
+            } else System.out.println(Error.requestClient);
         } catch (NullPointerException e) {
             System.out.println(Error.responseServ);
             e.printStackTrace();
@@ -564,7 +566,7 @@ class MessagePlayer {
     }
 
     private byte[] readFirstMessage(DataInputStream data) {
-        byte[] response = new byte[50];
+        byte[] response = new byte[50];//TODO: change size???
         try {
             int cpt = 0;
             int nbrStars = 0;
