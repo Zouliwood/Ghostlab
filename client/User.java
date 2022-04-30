@@ -149,7 +149,7 @@ public class User {
                                 }
                             }
                             if (gameActn == 0) flag = mp.quitGame();
-                            else if (gameActn == 1) flag = mp.listPlayer(ot, in, idGame);
+                            else if (gameActn == 1) flag = mp.listPlayerInGame(ot, in, idGame);//TODO: changer de commande
                             else if (gameActn == 4) {
                                 boolean flagerror;
                                 flag = false;

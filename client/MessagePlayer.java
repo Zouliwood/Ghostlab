@@ -511,4 +511,10 @@ class MessagePlayer {
         return new String(input_header, StandardCharsets.UTF_8);
     }
 
+    public boolean listPlayerInGame(DataOutputStream ot, DataInputStream in, int idGame) {
+        //TODO:
+        /*String messageString="GLIS?"+END_TCP;
+        byte[] message=*/
+        return listPlayer(ot, in, idGame);
+    }
 }

@@ -4,6 +4,20 @@
 //TODO: mutex with struct
 //pthread_mutex_t verrou= PTHREAD_MUTEX_INITIALIZER;
 
+void check_ghost(game *game, joueur* joueur, int i){
+    element* el=game->fantomes->first;
+    while (el!=NULL){
+        if ((*(struct fantome *)el).x == joueur->x && (*(struct fantome*)el).y == joueur->y+i){
+            joueur->score+=(*(struct fantome *)el).score;
+            //TODO: UDP
+            removeEl(game->fantomes, el);
+            free(el);
+            break;//1 fantome par case au plus
+        }
+        el=el->next;
+    }
+}
+
 void player_move(game *game, int direction, joueur* joueur, int distance){
     int i;
     //pthread_mutex_lock(&verrou);
@@ -11,24 +25,28 @@ void player_move(game *game, int direction, joueur* joueur, int distance){
         case TOP:{
             for (i = 0; i <= distance; ++i) {
                 if (joueur->y+i>=game->heightMap || game->map[joueur->y+i][joueur->x]) break;
+                else check_ghost(game, joueur, i);
             }
             joueur->y+=i;
         }
         case RIGHT:{
             for (i = 0; i <= distance; ++i) {
                 if (joueur->x+i>=game->widthMap || game->map[joueur->y][joueur->x+i]) break;
+                else check_ghost(game, joueur, i);
             }
             joueur->x+=i;
         }
         case BOTTOM:{
             for (i = 0; i <= distance; ++i) {
                 if (joueur->y-i<=0 || game->map[joueur->y-i][joueur->x]) break;
+                else check_ghost(game, joueur, i);
             }
             joueur->y-=i;
         }
         case LEFT:{
             for (i = 0; i <= distance; ++i) {
                 if (joueur->x-i<=0 || game->map[joueur->y][joueur->x-i]) break;
+                else check_ghost(game, joueur, i);
             }
             joueur->x-=i;
         }
