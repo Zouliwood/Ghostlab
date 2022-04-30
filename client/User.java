@@ -156,7 +156,7 @@ public class User {
                                 boolean flagerror;
                                 flag = false;
                                 do {
-                                    System.out.println("Dans quelle direction souhaitez-vous vous déplacer [UPMOM, RIMOV, DOMOV ou LEMOV]?");
+                                    System.out.println("Dans quelle direction souhaitez-vous vous déplacer [UPMOV, RIMOV, DOMOV ou LEMOV]?");
                                     String direction = new Scanner(System.in).nextLine();
                                     System.out.println("De combien de cases souhaitez-vous vous déplacer (nombre composé de 3 chiffres)?");
                                     String distance = new Scanner(System.in).nextLine();

@@ -519,8 +519,7 @@ class MessagePlayer {
             // response
             int nbrJoueur;
             byte[] response = readFirstMessage(in);
-            if (response == null)
-                throw new NullPointerException();
+            if (response == null) throw new NullPointerException();
             String responseString = new String(response, StandardCharsets.UTF_8);
             // [SIZE! m h w***]
             if (responseString.startsWith("GLIS! ")) {
@@ -529,21 +528,12 @@ class MessagePlayer {
                     response = readMessage(in);
                     responseString = new String(response, StandardCharsets.UTF_8);
 
-                    if (responseString.startsWith("GPYLR ")) {
-                        byte[] arrIdb = new byte[27];
-                        System.arraycopy(response, 6, arrIdb, 0, 8);
-                        String idPlayer = new String(arrIdb, StandardCharsets.UTF_8);
+                    if (responseString.startsWith("GPLYR ")) {
 
-                        byte[] corrdb = new byte[3];
-                        System.arraycopy(response, 15, arrIdb, 0, 3);
-                        int corrX = Integer.parseInt(new String(corrdb, StandardCharsets.UTF_8));
-
-                        System.arraycopy(response, 19, arrIdb, 0, 3);
-                        int corrY = Integer.parseInt(new String(corrdb, StandardCharsets.UTF_8));
-
-                        byte[] ptsJoueur = new byte[4];
-                        System.arraycopy(response, 23, arrIdb, 0, 4);
-                        int pts = Integer.parseInt(new String(ptsJoueur, StandardCharsets.UTF_8));
+                        String idPlayer = responseString.substring(6, 14);
+                        String corrX = responseString.substring(15, 18);
+                        String corrY = responseString.substring(19, 22);
+                        String pts = responseString.substring(23, 27);
 
                         System.out.println("Le joueur " + idPlayer + " en position (" + corrX + "," + corrY + ") a "
                                 + pts + " points.");
@@ -551,7 +541,7 @@ class MessagePlayer {
                         System.out.println(Error.responseServ);
                 }
             } else if (responseString.equals("GOBYE" + END_TCP)) {
-                System.out.println("La partie est terminé");
+                System.out.println("La partie est terminÃ©");
                 return true;
             } else
                 System.out.println(Error.requestClient);
@@ -564,9 +554,8 @@ class MessagePlayer {
         return false;
     }
 
-    // -------------------------Aux
-    // Function---------------------------------------------------------------------------------
-    // ----------------------------------------------------------------------------------------------------------------------
+    // -------------------------Aux Function----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
 
     private void inRangeUint8(int value) throws IndexOutOfBoundsException {
         if (value > 255 || value < 0) {
