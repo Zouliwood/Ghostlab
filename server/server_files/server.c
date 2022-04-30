@@ -172,7 +172,7 @@ void *client_thread(void *socket)
         }
         else if (strcmp(GLISC, command) == 0)
         {
-            // GLIS?
+            send_glis(sock2,me);
         }
         else if (strcmp(MALLC, command) == 0)
         {
