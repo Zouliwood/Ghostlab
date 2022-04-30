@@ -402,6 +402,7 @@ void movPlayer(int sock, int dir, joueur *joueur, listElements *games)
     char buffer[taille];
     if (taille != recv(sock, buffer, taille, 0))
     {
+        printf("Wrong size for mov\n");
         func_send_dunno(sock);
     }
 
@@ -411,32 +412,30 @@ void movPlayer(int sock, int dir, joueur *joueur, listElements *games)
     if (strcmp(endTCP, END_TCP) != 0)
     {
         func_send_dunno(sock);
+        printf("Wrong format for mov\n");
     }
 
     char distance[3];
     memmove(distance, buffer + 1, 3);
+    printf("%d\n",atoi(distance));
+    printf("x: %d y: %d\n",joueur->x,joueur->y);
     player_move(game, dir, joueur, atoi(distance));
-
-    // TODO: check if their are ghost
+    printf("x: %d y: %d\n",joueur->x,joueur->y);
     // TODO: [MOVEF x y p***]
     // TODO: use lock
 
-    char x_res[4];
-    sprintf(x_res, "%03d", joueur->x);
-
-    char y_res[4];
-    sprintf(y_res, "%03d", joueur->y);
-
     //[MOVE! x y ***]
-    int size_list = SIZE_OF_HEAD + 6 + SIZE_OF_END;
-    char games_mess[size_list];
+    taille = SIZE_OF_HEAD +2+6 + SIZE_OF_END;
+    char games_mess[taille+1];
     memmove(games_mess, MOVES, SIZE_OF_HEAD);
     memmove(games_mess + SIZE_OF_HEAD, " ", 1);
-    memmove(games_mess + SIZE_OF_HEAD + 1, x_res, 3);
+    sprintf(games_mess + SIZE_OF_HEAD + 1, "%03d", joueur->x);
     memmove(games_mess + SIZE_OF_HEAD + 4, " ", 1);
-    memmove(games_mess + SIZE_OF_HEAD + 5, y_res, 3);
+    sprintf(games_mess + SIZE_OF_HEAD + 5, "%03d", joueur->y);
     memmove(games_mess + SIZE_OF_HEAD + 8, END_TCP, SIZE_OF_END);
-    if (size_list != send(sock, games_mess, size_list, 0))
+    games_mess[taille]='\0';
+    printf("%s\n",games_mess);
+    if (taille != send(sock, games_mess, taille, 0))
         printf("Coudln't send list!");
     if (game->fantomes->count == 0)
     {
