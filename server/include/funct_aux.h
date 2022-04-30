@@ -29,8 +29,10 @@ void send_welco(int sock,joueur *joueur);
 // POSIT
 void send_posit(int sock,joueur *joueur);
 // MOV
-void movPlayer(int sock,int direction,joueur *joueur);
+void movPlayer(int sock,int direction,joueur *joueur,listElements *games);
 // IQUIT
 void quit_game(int sock, joueur *player, listElements* games);
+// GLIS!
+void send_glis(int sock,joueur *player);
 
 #endif
