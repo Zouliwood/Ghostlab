@@ -454,12 +454,15 @@ void quit_game(int sock, joueur *player, listElements *games)
     if (taille != recv(sock, buffer, taille, 0))
     {
         func_send_dunno(sock);
+        printf("%d\n",taille);
     }
     buffer[3] = '\0';
     if (strcmp(buffer, END_TCP) != 0)
     {
         func_send_dunno(sock);
+        printf("not end tcp %s\n",buffer);
     }
+    printf("ALL GOOD\n");
     // execution du iquit
     if (player->current != NULL)
     {
@@ -488,7 +491,7 @@ void quit_game(int sock, joueur *player, listElements *games)
     char goodbye[SIZE_OF_HEAD + SIZE_OF_END];
     memmove(goodbye, GOBYE, SIZE_OF_HEAD);
     memmove(goodbye + SIZE_OF_HEAD, END_TCP, SIZE_OF_END);
-    if (send(sock, goodbye, SIZE_OF_END + SIZE_OF_HEAD, 0))
+    if ((SIZE_OF_HEAD+SIZE_OF_END)!=send(sock, goodbye, SIZE_OF_END + SIZE_OF_HEAD, 0))
     {
         printf("Couldn't send GOBYE\n");
     }
@@ -519,7 +522,7 @@ void send_glis(int sock, joueur *player)
         memmove(gplyr_mess + SIZE_OF_HEAD + 13, " ", 1);
         sprintf(gplyr_mess + SIZE_OF_HEAD + 14, "%03d", ((joueur *)ptr->data)->y);
         memmove(gplyr_mess + SIZE_OF_HEAD + 17, " ", 1);
-        memmove(gplyr_mess + SIZE_OF_HEAD + 18, ((joueur *)ptr->data)->port, 4);
+        sprintf(gplyr_mess + SIZE_OF_HEAD + 18,"%04d",((joueur *)ptr->data)->score);
         memmove(gplyr_mess + SIZE_OF_HEAD + 22, END_TCP, SIZE_OF_END);
         if (taille != send(sock, gplyr_mess, taille, 0))
             printf("Couldn't send GPLYR %d\n", i);

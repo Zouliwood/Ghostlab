@@ -13,7 +13,15 @@ int main(int argc, char const *argv[])
     int sock = socket(PF_INET, SOCK_STREAM, 0);
     struct sockaddr_in address_sock;
     address_sock.sin_family = AF_INET;
-    address_sock.sin_port = htons(6969);
+    if (argc > 1)
+    {
+        int port = atoi(argv[1]);
+        address_sock.sin_port = htons(port);
+    }
+    else
+    {
+        address_sock.sin_port = htons(6969);
+    }
     address_sock.sin_addr.s_addr = htonl(INADDR_ANY);
     int r = bind(sock, (struct sockaddr *)&address_sock, sizeof(struct sockaddr_in));
     if (r == 0)
