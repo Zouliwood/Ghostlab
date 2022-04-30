@@ -368,29 +368,20 @@ class MessagePlayer {
             if (response == null)
                 throw new NullPointerException();
             String responseString = new String(response, StandardCharsets.UTF_8);
-            if (responseString.startsWith("MOVE!") || responseString.startsWith("MOVEF")) {
-
-                byte[] coordb = new byte[3];
-                System.arraycopy(response, 6, coordb, 0, 3);
-                int coordX = Integer.parseInt(new String(coordb, StandardCharsets.UTF_8));
-
-                System.arraycopy(response, 10, coordb, 0, 3);
-                int coordY = Integer.parseInt(new String(coordb, StandardCharsets.UTF_8));
-
-                byte[] nbrPts = new byte[4];
-                System.arraycopy(response, 14, nbrPts, 0, 4);
-                int nbrPtsPlayer = Integer.parseInt(new String(nbrPts, StandardCharsets.UTF_8));
-
-                if (responseString.startsWith("MOVEF")) {
-                    System.out.println("Vos nouvelles coordonées sont: (" + coordX + "," + coordY + ") "
-                            + " votre nouveau score est de " + nbrPtsPlayer);
-                } else
-                    System.out.println("Vos nouvelles coordonées sont: (" + coordX + "," + coordY + ")");
+            if (responseString.startsWith("MOVE!")) {
+                String coordX = responseString.substring(6,9);
+                String coordY = responseString.substring(10, 13);
+                System.out.println("Vos nouvelles coordonées sont: (" + coordX + "," + coordY + ")");
+            } else if(responseString.startsWith("MOVEF")){
+                String coordX = responseString.substring(6,9);
+                String coordY = responseString.substring(10, 13);
+                String nbrPtsPlayer = responseString.substring(14, 18);
+                System.out.println("Vos nouvelles coordonées sont: (" + coordX + "," + coordY + ") "
+                        + " votre nouveau score est de " + nbrPtsPlayer);
             } else if (responseString.startsWith("GOBYE")) {
                 System.out.println("La partie est terminé");
                 return true;
-            } else
-                System.out.println(Error.requestClient);
+            } else System.out.println(Error.requestClient);
             return false;
         } catch (NullPointerException e) {
             System.out.println(Error.responseServ);
