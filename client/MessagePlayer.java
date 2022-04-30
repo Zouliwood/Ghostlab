@@ -201,16 +201,9 @@ class MessagePlayer {
             //[POSIT id x y***]
             if (responseString.startsWith("POSIT ")) {
 
-                byte[] arrIdb = new byte[8];
-                System.arraycopy(response, 6, arrIdb, 0, 8);
-                String idPlayer = new String(arrIdb, StandardCharsets.UTF_8);
-
-                byte[] corrdb = new byte[3];
-                System.arraycopy(response, 15, arrIdb, 0, 3);
-                int corrX = Integer.parseInt(new String(corrdb, StandardCharsets.UTF_8));
-
-                System.arraycopy(response, 19, arrIdb, 0, 3);
-                int corrY = Integer.parseInt(new String(corrdb, StandardCharsets.UTF_8));
+                String idPlayer = responseString.substring(6, 14);
+                String corrX = responseString.substring(15, 18);
+                String corrY = responseString.substring(19, 22);
 
                 System.out.println("Joueur: " + idPlayer + " a pour position x: " + corrX + " et pour position y:" + corrY);
                 return true;
