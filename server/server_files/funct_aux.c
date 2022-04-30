@@ -48,14 +48,14 @@ joueur *new_game(int sock2, listElements *games)
     }
     printf("creation du joueur\n");
     // création du joueur
+    printf("%c%c%c%c\n",buffer[10],buffer[11],buffer[12],buffer[13]);
     joueur *j1 = malloc(sizeof(joueur));
     memmove(j1->id, buffer + 1, 8);
     memmove(j1->port, buffer + 10, 4);
+    printf("%s\n",j1->port);
     j1->score = 0;
-    j1->game_status = 0;
     j1->x = -1;
     j1->y = -1;
-    printf("récuperation IP\n");
     // récuperation IP
     struct sockaddr_in addr;
     socklen_t addr_size = sizeof(struct sockaddr_in);
@@ -67,7 +67,9 @@ joueur *new_game(int sock2, listElements *games)
     temp.s_addr = addr.sin_addr.s_addr;
     char *res = inet_ntoa(temp);
     memset(j1->ip, '#', 15);
+    printf("%ld\n",strlen(res));
     memmove(j1->ip, res, strlen(res));
+
     // création de la partie
     game *new = malloc(sizeof(game));
     new->encours = -1;
@@ -113,8 +115,6 @@ joueur *new_game(int sock2, listElements *games)
     addEl(games, games->last, new);
     // le joueurs pointe vers la partie créé
     j1->current = new;
-
-    printf("%d\n", new->joueurs->count);
     // envoie du REGOK
     taille = SIZE_OF_END + 1 + sizeof(uint8_t) + SIZE_OF_HEAD;
     char message[taille];
@@ -140,7 +140,7 @@ joueur *register_game(int sock2, listElements *games)
         printf("register taille != Dunno\n");
         return NULL;
     }
-    uint8_t id = *(uint8_t *)(buffer + 15);
+    uint8_t id =*(uint8_t*)(buffer + 15);
     game *_game = get_game(games, id);
     if (!_game)
     {
@@ -148,13 +148,27 @@ joueur *register_game(int sock2, listElements *games)
         printf("id = %d regno\n", id);
         return NULL;
     }
+
     // création du joueur
     joueur *j1 = malloc(sizeof(joueur));
     memmove(j1->id, buffer + 1, 8);
     memmove(j1->port, buffer + 10, 4);
+    printf("%s\n",j1->port);
     j1->score = 0;
     j1->x = -1;
     j1->y = -1;
+        // récuperation IP
+    struct sockaddr_in addr;
+    socklen_t addr_size = sizeof(struct sockaddr_in);
+    if (getpeername(sock2, (struct sockaddr *)&addr, &addr_size) == -1)
+    {
+        printf("Couldn't get ip");
+    }
+    struct in_addr temp;
+    temp.s_addr = addr.sin_addr.s_addr;
+    char *res = inet_ntoa(temp);
+    memset(j1->ip, '#', 15);
+    memmove(j1->ip, res, strlen(res));
     addEl(_game->joueurs, _game->joueurs->last, j1);
     j1->current = _game;
 
@@ -311,22 +325,26 @@ void get_size_map(int sock, listElements *games)
 void send_welco(int sock, joueur *joueur)
 {
     int taille = SIZE_OF_HEAD + SIZE_OF_END + 16 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2) + 4 + 5;
-    char buffer[taille];
-    memmove(buffer, WELCO, SIZE_OF_HEAD);
-    memmove(buffer + SIZE_OF_HEAD, " ", 1);
-    memmove(buffer + SIZE_OF_HEAD + 1, &joueur->current->game_id, sizeof(uint8_t));
-    memmove(buffer + SIZE_OF_HEAD + 1 + sizeof(uint8_t), " ", 1);
-    memmove(buffer + SIZE_OF_HEAD + 2 + sizeof(uint8_t), &joueur->current->heightMap, sizeof(uint16_t));
-    memmove(buffer + SIZE_OF_HEAD + 2 + sizeof(uint8_t) + sizeof(uint16_t), " ", 1);
-    memmove(buffer + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + sizeof(uint16_t), &joueur->current->widthMap, sizeof(uint16_t));
-    memmove(buffer + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + (sizeof(uint16_t) * 2), " ", 1);
-    memmove(buffer + SIZE_OF_HEAD + 4 + sizeof(uint8_t) + (sizeof(uint16_t) * 2), &joueur->current->fantomes->count, sizeof(uint8_t));
-    memmove(buffer + SIZE_OF_HEAD + 4 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), " ", 1);
-    memmove(buffer + SIZE_OF_HEAD + 5 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), joueur->ip, 15);
-    memmove(buffer + SIZE_OF_HEAD + 20 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), " ", 1);
-    memmove(buffer + SIZE_OF_HEAD + 21 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), joueur->port, 4);
-    memmove(buffer + SIZE_OF_HEAD + 25 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), END_TCP, SIZE_OF_END);
-    if (taille != send(sock, buffer, taille, 0))
+    char welco_mess[taille];
+    printf("%s\n",joueur->ip);
+    printf("%d\n",joueur->current->heightMap);
+    printf("%d\n",joueur->current->widthMap);
+    printf("%d\n",joueur->current->fantomes->count);
+    memmove(welco_mess, WELCO, SIZE_OF_HEAD);
+    memmove(welco_mess + SIZE_OF_HEAD, " ", 1);
+    memmove(welco_mess + SIZE_OF_HEAD + 1, &joueur->current->game_id, sizeof(uint8_t));
+    memmove(welco_mess + SIZE_OF_HEAD + 1 + sizeof(uint8_t), " ", 1);
+    memmove(welco_mess + SIZE_OF_HEAD + 2 + sizeof(uint8_t), &joueur->current->heightMap, sizeof(uint16_t));
+    memmove(welco_mess + SIZE_OF_HEAD + 2 + sizeof(uint8_t) + sizeof(uint16_t), " ", 1);
+    memmove(welco_mess + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + sizeof(uint16_t), &joueur->current->widthMap, sizeof(uint16_t));
+    memmove(welco_mess + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + (sizeof(uint16_t) * 2), " ", 1);
+    memmove(welco_mess + SIZE_OF_HEAD + 4 + sizeof(uint8_t) + (sizeof(uint16_t) * 2), &joueur->current->fantomes->count, sizeof(uint8_t));
+    memmove(welco_mess + SIZE_OF_HEAD + 4 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), " ", 1);
+    memmove(welco_mess + SIZE_OF_HEAD + 5 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), joueur->ip, 15);
+    memmove(welco_mess + SIZE_OF_HEAD + 20 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), " ", 1);
+    memmove(welco_mess + SIZE_OF_HEAD + 21 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), joueur->port, 4);
+    memmove(welco_mess + SIZE_OF_HEAD + 25 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), END_TCP, SIZE_OF_END);
+    if (taille != send(sock, welco_mess, taille, 0))
     {
         printf("Coudln't send WELCO\n");
     }

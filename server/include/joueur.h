@@ -13,7 +13,6 @@ struct joueur
     int y;
     uint32_t score;
     game *current;
-    int game_status;
 };
 typedef struct joueur joueur;
 

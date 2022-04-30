@@ -60,7 +60,6 @@ void *client_thread(void *socket)
         }
         else if (strcmp(command, REGIS) == 0)
         {
-            printf("registering game\n");
             if (me != NULL)
             {
                 func_send_dunno(sock2);
@@ -71,7 +70,6 @@ void *client_thread(void *socket)
         }
         else if (strcmp(command, START) == 0)
         {
-            printf("start player \n");
             start_game(me, sock2);
             break;
         }
@@ -135,8 +133,10 @@ void *client_thread(void *socket)
             printf("118 Dunno\n");
         }
     }
+    while(me->current->encours==0);
     if (me->current->encours == 1)
     {
+        printf("WELCOME %s\n",me->id);
         send_welco(sock2, me);
     }
     while (me->current->encours == 1)

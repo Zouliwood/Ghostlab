@@ -77,23 +77,22 @@ void generic_move(void* entity, int isGhost, game *game){
  * @param fantome
  * @param game
  */
-void init_pos_player(joueur* joueur, game *game){
-    generic_move(&joueur, 0, game);
-
+void init_pos_player(joueur* player, game *game){
+    generic_move(player, 0, game);
     //pthread_mutex_lock(&verrou);
     //éviter les collisions
     element* el=game->fantomes->first;
     while (el!=NULL){
-        if ((*(fantome *)el).x == joueur->x && (*(fantome*)el).y == joueur->y){
-            init_pos_player(joueur, game);
+        if (((fantome *)el->data)->x == player->x && ((fantome*)el->data)->y == player->y){
+            init_pos_player(player, game);
         }
         el=el->next;
     }
-
     el=game->joueurs->first;
     while (el!=NULL){
-        if ((*(struct joueur*)el).x == joueur->x && (*(struct joueur*)el).y == joueur->y){
-            init_pos_player(joueur, game);
+        if (((joueur*)el->data)->x == player->x && ((joueur*)el->data)->y == player->y
+        && player!=((joueur *)el->data)){
+            init_pos_player(player, game);
         }
         el=el->next;
     }
@@ -101,20 +100,21 @@ void init_pos_player(joueur* joueur, game *game){
 
 }
 
-void no_collision(void (*mov)(fantome* fantome,game *game), fantome* fantome, game *game){
+void no_collision(void (*mov)(fantome* fantome,game *game), fantome* fantom, game *game){
     //pthread_mutex_lock(&verrou);
     element* el=game->joueurs->first;
     while (el!=NULL){
-        if ((*(joueur*)el).x == fantome->x && (*(joueur*)el).y == fantome->y){
-            mov(fantome, game);
+        if (((joueur*)el->data)->x == fantom->x && ((joueur*)el->data)->y == fantom->y){
+            mov(fantom, game);
         }
         el=el->next;
     }
 
     el=game->fantomes->first;
     while (el!=NULL){
-        if ((*(struct fantome *)el).x == fantome->x && (*(struct fantome*)el).y == fantome->y){
-            mov(fantome, game);
+        if (((fantome *)el->data)->x == fantom->x && ((fantome*)el->data)->y == fantom->y
+        && fantom!=((fantome *)el->data)){
+            mov(fantom, game);
         }
         el=el->next;
     }
