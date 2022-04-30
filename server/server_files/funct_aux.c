@@ -220,15 +220,25 @@ void func_send_regno(int sock2)
 
 void start_game(joueur *joueur, int socket)
 {
-    if (joueur->current == NULL)
-    {
+    char end_start[4];
+    int count = recv(socket, end_start, SIZE_OF_END, 0);
+    end_start[count]='\0';
+    if(strcmp(end_start,END_TCP)!=0){
         func_send_dunno(socket);
+        printf("Wrong input for start");
     }
-    joueur->current->start += 1;
-    init_pos_player(joueur, joueur->current);
-    if (joueur->current->start > 1 && joueur->current->start == joueur->current->joueurs->count)
+    else
     {
-        joueur->current->encours = 1;
+        if (joueur->current == NULL)
+        {
+            func_send_dunno(socket);
+        }
+        joueur->current->start += 1;
+        init_pos_player(joueur, joueur->current);
+        if (joueur->current->start > 1 && joueur->current->start == joueur->current->joueurs->count)
+        {
+            joueur->current->encours = 1;
+        }
     }
 }
 
@@ -367,17 +377,17 @@ void send_welco(int sock, joueur *player)
 void send_posit(int sock, joueur *joueur)
 {
     int taille = SIZE_OF_HEAD + 17 + SIZE_OF_END;
-    char reponse[taille+1];
+    char reponse[taille + 1];
     memmove(reponse, POSIT, SIZE_OF_HEAD);
-    memmove(reponse+SIZE_OF_HEAD," ",1);
-    memmove(reponse+SIZE_OF_HEAD+1,joueur->id,8);
-    memmove(reponse+SIZE_OF_HEAD+9," ",1);
-    sprintf(reponse + SIZE_OF_HEAD+10, "%03d",joueur->x);
-    memmove(reponse+SIZE_OF_HEAD+13," ",1);
-    sprintf(reponse+SIZE_OF_HEAD+14,"%03d",joueur->y);
-    memmove(reponse+SIZE_OF_HEAD+17,END_TCP,SIZE_OF_END);
-    reponse[taille]='\0';
-    printf("%s\n",reponse);
+    memmove(reponse + SIZE_OF_HEAD, " ", 1);
+    memmove(reponse + SIZE_OF_HEAD + 1, joueur->id, 8);
+    memmove(reponse + SIZE_OF_HEAD + 9, " ", 1);
+    sprintf(reponse + SIZE_OF_HEAD + 10, "%03d", joueur->x);
+    memmove(reponse + SIZE_OF_HEAD + 13, " ", 1);
+    sprintf(reponse + SIZE_OF_HEAD + 14, "%03d", joueur->y);
+    memmove(reponse + SIZE_OF_HEAD + 17, END_TCP, SIZE_OF_END);
+    reponse[taille] = '\0';
+    printf("%s\n", reponse);
     if (taille != send(sock, reponse, taille, 0))
     {
         printf("Coudln't send POSIT\n");

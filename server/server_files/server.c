@@ -2,6 +2,7 @@
 
 // déclaration des variables
 listElements *games; // liste des parties partie->count pour le nombre de parties
+pthread_mutex_t verrou = PTHREAD_MUTEX_INITIALIZER;
 
 int main(int argc, char const *argv[])
 {
@@ -70,6 +71,7 @@ void *client_thread(void *socket)
         }
         else if (strcmp(command, START) == 0)
         {
+            printf("Start game !");
             start_game(me, sock2);
             break;
         }
@@ -133,9 +135,13 @@ void *client_thread(void *socket)
             printf("118 Dunno\n");
         }
     }
-    while(me->current->encours==0);
+    printf("I'm waiting\n");
+    while(me->current->encours==0){
+        // do nothing
+    }
     if (me->current->encours == 1)
     {
+        printf("WELCOME\n");
         send_welco(sock2, me);
     }
     while (me->current->encours == 1)
