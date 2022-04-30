@@ -345,7 +345,7 @@ void send_posit(int sock, joueur *joueur)
     }
 }
 
-void movPlayer(int sock, int dir, joueur *joueur)
+void movPlayer(int sock, int dir, joueur *joueur,listElements *games)
 {
     game *game = joueur->current;
     int taille = 1 + 3 + SIZE_OF_END;
@@ -388,7 +388,11 @@ void movPlayer(int sock, int dir, joueur *joueur)
     memmove(games_mess + SIZE_OF_HEAD + 8, END_TCP, SIZE_OF_END);
     if (size_list != send(sock, games_mess, size_list, 0))
         printf("Coudln't send list!");
-    movGhost(game);
+    if(game->fantomes->count==0)
+    {
+        // TODO traiter fin de la game
+    }
+    else movGhost(game);
 }
 
 void quit_game(int sock, joueur *player, listElements *games)
@@ -432,5 +436,34 @@ void quit_game(int sock, joueur *player, listElements *games)
     memmove(goodbye+SIZE_OF_HEAD,END_TCP,SIZE_OF_END);
     if(send(sock,goodbye,SIZE_OF_END+SIZE_OF_HEAD,0)){
         printf("Couldn't send GOBYE\n");
+    }
+}
+
+void send_glis(int sock,joueur *player)
+{
+    game *game_current=player->current;
+    int taille =SIZE_OF_HEAD + 1 + SIZE_OF_END+ sizeof(uint8_t);
+    char glis_mess[taille];
+    memmove(glis_mess, LISTS, SIZE_OF_HEAD);
+    memmove(glis_mess + SIZE_OF_HEAD, " ", 1);
+    memmove(glis_mess + SIZE_OF_HEAD + 1, &(game_current->joueurs->count), sizeof(uint8_t));
+    memmove(glis_mess + SIZE_OF_HEAD + 1 + sizeof(uint8_t), END_TCP, SIZE_OF_END);
+    if (taille != send(sock, glis_mess, taille, 0))
+        printf("Coudln't send glis!\n");
+    element *ptr = game_current->joueurs->first;
+    for (int i = 0; i < game_current->joueurs->count; i++)
+    {
+        taille = SIZE_OF_HEAD +4+8+4+3+3+SIZE_OF_END;
+        //port+id+_+x+Y
+        char gplyr_mess[taille];
+        memmove(gplyr_mess, GPLYR, SIZE_OF_HEAD);
+        memmove(gplyr_mess + SIZE_OF_HEAD, " ", 1);
+        memmove(gplyr_mess + SIZE_OF_HEAD + 1, &(((joueur *)ptr->data)->id), 8);
+        sprintf(gplyr_mess + SIZE_OF_HEAD + 9," %03d %03d ",((joueur *)ptr->data)->x,((joueur *)ptr->data)->y);
+        memmove(gplyr_mess + SIZE_OF_HEAD + 18, ((joueur *)ptr->data)->port, 4);
+        memmove(gplyr_mess + SIZE_OF_HEAD + 22,END_TCP,SIZE_OF_END);
+        if (taille != send(sock, gplyr_mess, taille, 0))
+            printf("Couldn't send GPLYR %d\n", i);
+        ptr = ptr->next;
     }
 }

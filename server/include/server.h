@@ -34,6 +34,8 @@
 #define MOVEF "MOVEF"
 #define WELCO "WELCO"
 #define POSIT "POSIT"
+#define GLISS "GLIS!"
+#define GPLYR "GPLYR"
 #define GOBYE "GOBYE"
 // commandes client
 #define NEWPL "NEWPL"
@@ -48,6 +50,9 @@
 #define DOMOV "DOMOV"
 #define LEMOV "LEMOV"
 #define RIMOV "RIMOV"
+#define GLISC "GLIS?"
+#define MALLC "MALL?"
+#define SENDC "SEND?"
 void *client_thread(void *socket);
 
 #endif

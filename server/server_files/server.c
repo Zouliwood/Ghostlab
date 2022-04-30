@@ -146,24 +146,36 @@ void *client_thread(void *socket)
         command[count] = '\0';
         if (strcmp(UPMOV, command) == 0)
         {
-            movPlayer(sock2, 0, me);
+            movPlayer(sock2, 0, me,games);
         }
         else if (strcmp(DOMOV, command) == 0)
         {
-            movPlayer(sock2, 2, me);
+            movPlayer(sock2, 2, me,games);
         }
         else if (strcmp(LEMOV, command) == 0)
         {
-            movPlayer(sock2, 3, me);
+            movPlayer(sock2, 3, me,games);
         }
         else if (strcmp(RIMOV, command) == 0)
         {
-            movPlayer(sock2, 1, me);
+            movPlayer(sock2, 1, me,games);
         }
         else if (strcmp(IQUIT, command) == 0)
         {
             quit_game(sock2,me,games);
             break;
+        }
+        else if (strcmp(GLISC, command) == 0)
+        {
+            // GLIS?
+        }
+        else if (strcmp(MALLC, command) == 0)
+        {
+            //MALL?
+        }
+        else if (strcmp(SENDC, command) == 0)
+        {
+            //SEND?_id_mess
         }
         else
         {
