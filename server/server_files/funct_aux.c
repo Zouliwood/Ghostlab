@@ -241,6 +241,7 @@ void start_game(joueur *joueur, int socket)
             joueur->current->encours = 1;
         }
     }
+    printMap(joueur->current->map,joueur->current->heightMap,joueur->current->widthMap);
 }
 
 void *func_unreg(joueur *joueur, listElements *games, int sock)
