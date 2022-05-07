@@ -152,7 +152,7 @@ class MessagePlayer {
     // ----------------------------------------------------------------------------------------------------------------------
 
     // [START***]
-    public boolean readyPlay() {
+    public PlayerMulticast readyPlay() {
         try {
             // request
             String s = "START" + END_TCP;
@@ -199,29 +199,11 @@ class MessagePlayer {
                         System.out.println("La partie " + idGame + " a pour hauteur " + heightMap + ", largeur "
                                 + widthMap + ", nombre de fantomes " + nbrGhost + ", adresse ip de multidiffusion "
                                 + ipMultiDiff + " et port de multi diffusion " + portMultiDiff);
-                        break;
+                        return new PlayerMulticast(ipMultiDiff, portMultiDiff);
                     }
                 }
             }
-
-            // response
-            response = readFirstMessage(in);
-            if (response == null)
-                throw new NullPointerException();
-            responseString = new String(response, StandardCharsets.UTF_8);
-
-            // [POSIT id x y***]
-            if (responseString.startsWith("POSIT ")) {
-
-                String idPlayer = responseString.substring(6, 14);
-                String corrX = responseString.substring(15, 18);
-                String corrY = responseString.substring(19, 22);
-
-                System.out.println(
-                        "Joueur: " + idPlayer + " a pour position x: " + corrX + " et pour position y:" + corrY);
-                return true;
-            } else
-                System.out.println(Error.requestClient);
+            //TODO: posIT
         } catch (NullPointerException e) {
             System.out.println(Error.responseServ);
             e.printStackTrace();
@@ -229,6 +211,28 @@ class MessagePlayer {
             System.out.println(Error.requestServ);
             e.printStackTrace();
         }
+        return null;
+    }
+
+    public boolean getposIT(){
+        // response
+        byte[] response = readFirstMessage(in);
+        if (response == null)
+            throw new NullPointerException();
+        String responseString = new String(response, StandardCharsets.UTF_8);
+
+        // [POSIT id x y***]
+        if (responseString.startsWith("POSIT ")) {
+
+            String idPlayer = responseString.substring(6, 14);
+            String corrX = responseString.substring(15, 18);
+            String corrY = responseString.substring(19, 22);
+
+            System.out.println(
+                    "Joueur: " + idPlayer + " a pour position x: " + corrX + " et pour position y:" + corrY);
+            return true;
+        } else
+            System.out.println(Error.requestClient);
         return false;
     }
 
