@@ -79,7 +79,7 @@ void *client_thread(void *socket)
         }
         else if (strcmp(command, START) == 0)
         {
-            printf("Start game !");
+            printf("Start game !\n");
             start_game(me, sock2);
             break;
         }
@@ -144,69 +144,80 @@ void *client_thread(void *socket)
         }
     }
     printf("I'm waiting\n");
-    while(me->current->encours==0){
+    while (lockGameStatus(me->current) == -1)
+    {
         // do nothing
     }
-    if (me->current->encours == 1)
+    if (lockGameStatus(me->current) == 1)
     {
         printf("WELCOME\n");
         send_welco(sock2, me);
-    }
-    while (me->current->encours == 1)
-    {
-        char command[SIZE_OF_HEAD + 1];
-        int count = recv(sock2, command, SIZE_OF_HEAD, 0);
-        command[count] = '\0';
-        if (strcmp(UPMOV, command) == 0)
+        while (lockGameStatus(me->current) == 1)
         {
-            printf("UP ");
-            movPlayer(sock2, 0, me,games);
-        }
-        else if (strcmp(DOMOV, command) == 0)
-        {
-            movPlayer(sock2, 2, me,games);
-            printf("DOWN ");
-        }
-        else if (strcmp(LEMOV, command) == 0)
-        {
-            printf("LEFT ");
-            movPlayer(sock2, 3, me,games);
-        }
-        else if (strcmp(RIMOV, command) == 0)
-        {
-            printf("RIGHT ");
-            movPlayer(sock2, 1, me,games);
-        }
-        else if (strcmp(IQUIT, command) == 0)
-        {
-            quit_game(sock2,me,games);
-            break;
-        }
-        else if (strcmp(GLISC, command) == 0)
-        {
-            char end[SIZE_OF_END+1];
-            int r = recv(sock2, end, SIZE_OF_END, 0);
-            end[r]='\0';
-            if (r != SIZE_OF_END || strcmp(end,END_TCP)!=0)
+            char command[SIZE_OF_HEAD + 1];
+            int count = recv(sock2, command, SIZE_OF_HEAD, 0);
+            command[count] = '\0';
+            if (strcmp(UPMOV, command) == 0)
+            {
+                printf("UP ");
+                movPlayer(sock2, 0, me, games);
+            }
+            else if (strcmp(DOMOV, command) == 0)
+            {
+                movPlayer(sock2, 2, me, games);
+                printf("DOWN ");
+            }
+            else if (strcmp(LEMOV, command) == 0)
+            {
+                printf("LEFT ");
+                movPlayer(sock2, 3, me, games);
+            }
+            else if (strcmp(RIMOV, command) == 0)
+            {
+                printf("RIGHT ");
+                movPlayer(sock2, 1, me, games);
+            }
+            else if (strcmp(IQUIT, command) == 0)
+            {
+                quit_game(sock2, me, games);
+                break;
+            }
+            else if (strcmp(GLISC, command) == 0)
+            {
+                char end[SIZE_OF_END + 1];
+                int r = recv(sock2, end, SIZE_OF_END, 0);
+                end[r] = '\0';
+                if (r != SIZE_OF_END || strcmp(end, END_TCP) != 0)
+                {
+                    func_send_dunno(sock2);
+                    printf("75 Dunno\n");
+                }
+                else
+                    send_glis(sock2, me);
+            }
+            else if (strcmp(MALLC, command) == 0)
+            {
+                // MALL?
+            }
+            else if (strcmp(SENDC, command) == 0)
+            {
+                // SEND?_id_mess
+            }
+            else
             {
                 func_send_dunno(sock2);
-                printf("75 Dunno\n");
             }
-            else send_glis(sock2,me);
-        }
-        else if (strcmp(MALLC, command) == 0)
-        {
-            //MALL?
-        }
-        else if (strcmp(SENDC, command) == 0)
-        {
-            //SEND?_id_mess
-        }
-        else
-        {
-            func_send_dunno(sock2);
         }
     }
     close(sock2);
     return NULL;
+}
+
+int lockGameStatus(game *current)
+{
+    int res;
+    pthread_mutex_lock(&verrou);
+    res = current->encours;
+    pthread_mutex_unlock(&verrou);
+    return res;
 }

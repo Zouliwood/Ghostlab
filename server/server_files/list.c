@@ -1,6 +1,8 @@
 #include <stdlib.h> 
 #include "list.h"
 
+extern pthread_mutex_t verrou;
+
 // Remove element (return 0 if success, -1 if error)
 int removeEl(struct listElements *list, struct element *el)
 {
@@ -10,7 +12,7 @@ int removeEl(struct listElements *list, struct element *el)
     {
         return -1;
     }
-
+    pthread_mutex_lock(&verrou);
     if (el->prev && el->next) 
     {
         el->prev->next = el->next;
@@ -43,11 +45,10 @@ int removeEl(struct listElements *list, struct element *el)
             result = 0;  
         }
     }
-
-    free(el);
-
     list->count--;
-
+    pthread_mutex_unlock(&verrou);
+    
+    free(el);
     return result;
 }
 
@@ -64,8 +65,9 @@ struct element* addEl(struct listElements *list, struct element *prevEl, void *d
     newEl->data = data;
     newEl->next = NULL;
     newEl->prev = NULL;
+
+    pthread_mutex_lock(&verrou);
     list->count++;
-    
     if (prevEl)
     {
         newEl->next = prevEl->next; 
@@ -94,6 +96,6 @@ struct element* addEl(struct listElements *list, struct element *prevEl, void *d
     {
         list->last = newEl;        
     }
-    
+    pthread_mutex_unlock(&verrou);
     return newEl;
 }

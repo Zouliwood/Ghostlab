@@ -1,6 +1,7 @@
 #ifndef LIST
 #define LIST
 #include <stdint.h>
+#include <pthread.h>
 
 struct element
 {

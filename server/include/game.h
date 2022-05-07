@@ -13,7 +13,7 @@ struct game
 {
     uint8_t game_id;
     listElements *joueurs;
-    int encours; // -1 notstarted // 0 ingame
+    int encours; // -1 notstarted // 1 ingame
     int start;
     int** map;
     listElements *fantomes;

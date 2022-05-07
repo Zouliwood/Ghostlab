@@ -54,5 +54,6 @@
 #define MALLC "MALL?"
 #define SENDC "SEND?"
 void *client_thread(void *socket);
+int lockGameStatus(game *current);
 
 #endif

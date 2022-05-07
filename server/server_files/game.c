@@ -1,10 +1,14 @@
 #include "game.h"
 
+extern pthread_mutex_t verrou;
+
 game *get_game(listElements *games, uint8_t game_id)
 {
     if (games == NULL || games->first == NULL)
         return NULL;
+    pthread_mutex_lock(&verrou);
     element *ptr = games->first;
+    pthread_mutex_unlock(&verrou);
     while (ptr)
     {
         if (((game *)ptr->data)->game_id == game_id)
@@ -13,7 +17,9 @@ game *get_game(listElements *games, uint8_t game_id)
         }
         else
         {
+            pthread_mutex_lock(&verrou);
             ptr = ptr->next;
+            pthread_mutex_unlock(&verrou);
         }
     }
     return NULL;

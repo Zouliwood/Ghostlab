@@ -23,43 +23,35 @@ void player_move(game *game, int direction, joueur* joueur, int distance){
     //pthread_mutex_lock(&verrou);
     switch (direction) {
         case 0:
-            printf("0\n");
             for (i = 0; i <= distance; ++i) {
                 printf("%d cond 1; %d cond 2\n",joueur->y+i,game->map[joueur->y+i][joueur->x]);
                 if (joueur->y+i>=game->heightMap || game->map[joueur->y+i][joueur->x]) break;
                 else check_ghost(game, joueur, i);
             }
-            printf("%d\n",i);
             joueur->y+=i;
             break;
         case 1:
-            printf("1\n");
             for (i = 0; i <= distance; ++i) {
                 printf("%d cond 1; %d cond 2\n",joueur->x+i,game->map[joueur->y][joueur->x+i]);
                 if (joueur->x+i>=game->widthMap || game->map[joueur->y][joueur->x+i]) break;
                 else check_ghost(game, joueur, i);
             }
-            printf("%d\n",i);
             joueur->x+=i;
             break;
         case 2:
-            printf("2\n");
             for (i = 0; i <= distance; ++i) {
                 printf("%d cond 1; %d cond 2\n",joueur->y-i,game->map[joueur->y-i][joueur->x]);
                 if (joueur->y-i<=0 || game->map[joueur->y-i][joueur->x]) break;
                 else check_ghost(game, joueur, i);
             }
-            printf("%d\n",i);
             joueur->y-=i;
             break;
         case 3:
-            printf("3\n");
             for (i = 0; i <= distance; ++i) {
                 printf("%d cond 1; %d cond 2\n",joueur->x-i,game->map[joueur->y][joueur->x-i]);
                 if (joueur->x-i<=0 || game->map[joueur->y][joueur->x-i]) break;
                 else check_ghost(game, joueur, i);
             }
-            printf("%d\n",i);
             joueur->x-=i;
             break;
     }
