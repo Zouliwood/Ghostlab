@@ -121,8 +121,6 @@ void generic_move(void *entity, int isGhost, game *game)
 void init_pos_player(joueur *player, game *game)
 {
     generic_move(player, 0, game);
-    // pthread_mutex_lock(&verrou);
-    //éviter les collisions
     element *el = game->fantomes->first;
     while (el != NULL)
     {
@@ -132,41 +130,49 @@ void init_pos_player(joueur *player, game *game)
         }
         el = el->next;
     }
+    pthread_mutex_lock(&verrou);
     el = game->joueurs->first;
+    pthread_mutex_unlock(&verrou);
     while (el != NULL)
     {
         if (((joueur *)el->data)->x == player->x && ((joueur *)el->data)->y == player->y && player != ((joueur *)el->data))
         {
             init_pos_player(player, game);
         }
+        pthread_mutex_lock(&verrou);
         el = el->next;
+        pthread_mutex_unlock(&verrou);
     }
-    // pthread_mutex_unlock(&verrou);
 }
 
 void no_collision(void (*mov)(fantome *fantome, game *game), fantome *fantom, game *game)
 {
-    // pthread_mutex_lock(&verrou);
+    pthread_mutex_lock(&verrou);
     element *el = game->joueurs->first;
+    pthread_mutex_unlock(&verrou);
     while (el != NULL)
     {
         if (((joueur *)el->data)->x == fantom->x && ((joueur *)el->data)->y == fantom->y)
         {
             mov(fantom, game);
         }
+        pthread_mutex_lock(&verrou);
         el = el->next;
+        pthread_mutex_unlock(&verrou);
     }
-
+    pthread_mutex_lock(&verrou);
     el = game->fantomes->first;
+    pthread_mutex_unlock(&verrou);
     while (el != NULL)
     {
         if (((fantome *)el->data)->x == fantom->x && ((fantome *)el->data)->y == fantom->y && fantom != ((fantome *)el->data))
         {
             mov(fantom, game);
         }
+        pthread_mutex_lock(&verrou);
         el = el->next;
+        pthread_mutex_unlock(&verrou);
     }
-    // pthread_mutex_unlock(&verrou);
 }
 
 /**
@@ -176,7 +182,53 @@ void no_collision(void (*mov)(fantome *fantome, game *game), fantome *fantom, ga
  */
 void ghost_move(fantome *fantome, game *game)
 {
-    generic_move(fantome, 1, game);
+    srand(time(NULL));
+    int direction = rand() % 4;
+    switch (direction)
+    {
+    case 0:
+        if (fantome->y + 1 >= game->heightMap || game->map[fantome->y + 1][fantome->x])
+        {
+            break;
+        }
+        else
+        {
+            pthread_mutex_lock(&verrou);
+            fantome->y += 1;
+            pthread_mutex_unlock(&verrou);
+        }
+        break;
+    case 1:
+        if (fantome->x + 1 >= game->widthMap || game->map[fantome->y][fantome->x + 1])
+            break;
+        else
+        {
+            pthread_mutex_lock(&verrou);
+            fantome->x += 1;
+            pthread_mutex_unlock(&verrou);
+        }
+        break;
+    case 2:
+        if (fantome->y - 1 < 0 || game->map[fantome->y - 1][fantome->x])
+            break;
+        else
+        {
+            pthread_mutex_lock(&verrou);
+            fantome->y -= 1;
+            pthread_mutex_unlock(&verrou);
+        }
+        break;
+    case 3:
+        if (fantome->x - 1 < 0 || game->map[fantome->y][fantome->x - 1])
+            break;
+        else
+        {
+            pthread_mutex_lock(&verrou);
+            fantome->x -= 1;
+            pthread_mutex_unlock(&verrou);
+        }
+        break;
+    }
     no_collision(ghost_move, fantome, game);
 }
 
