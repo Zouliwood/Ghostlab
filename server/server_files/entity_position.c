@@ -1,79 +1,116 @@
 #include <entity_position.h>
 #include <pthread.h>
 
-//TODO: mutex with struct
-//pthread_mutex_t verrou= PTHREAD_MUTEX_INITIALIZER;
+extern pthread_mutex_t verrou;
 
-void check_ghost(game *game, joueur* joueur, int i){
-    element* el=game->fantomes->first;
-    while (el!=NULL){
-        if ((*(struct fantome *)el).x == joueur->x && (*(struct fantome*)el).y == joueur->y+i){
-            joueur->score+=(*(struct fantome *)el).score;
-            //TODO: UDP
+void check_ghost(game *game, joueur *joueur)
+{
+    pthread_mutex_lock(&verrou);
+    element *el = game->fantomes->first;
+    pthread_mutex_unlock(&verrou);
+    while (el != NULL)
+    {
+        if (((fantome *)el->data)->x == joueur->x && ((fantome *)el->data)->y == joueur->y)
+        {
+            joueur->score += ((fantome *)el->data)->score;
+            // TODO: UDP
             removeEl(game->fantomes, el);
-            free(el);
-            break;//1 fantome par case au plus
+            break; // 1 fantome par case au plus
         }
-        el=el->next;
+        pthread_mutex_lock(&verrou);
+        el = el->next;
+        pthread_mutex_unlock(&verrou);
     }
 }
 
-void player_move(game *game, int direction, joueur* joueur, int distance){
-    int i;
-    //pthread_mutex_lock(&verrou);
-    switch (direction) {
-        case 0:
-            for (i = 0; i <= distance; ++i) {
-                printf("%d cond 1; %d cond 2\n",joueur->y+i,game->map[joueur->y+i][joueur->x]);
-                if (joueur->y+i>=game->heightMap || game->map[joueur->y+i][joueur->x]) break;
-                else check_ghost(game, joueur, i);
+void player_move(game *game, int direction, joueur *joueur, int distance)
+{
+    switch (direction)
+    {
+    case 0:
+        while (distance >= 0)
+        {
+            if (joueur->y + 1 >= game->heightMap || game->map[joueur->y + 1][joueur->x])
+                break;
+            else
+            {
+                pthread_mutex_lock(&verrou);
+                joueur->y += 1;
+                pthread_mutex_unlock(&verrou);
+                check_ghost(game, joueur);
             }
-            joueur->y+=i;
-            break;
-        case 1:
-            for (i = 0; i <= distance; ++i) {
-                printf("%d cond 1; %d cond 2\n",joueur->x+i,game->map[joueur->y][joueur->x+i]);
-                if (joueur->x+i>=game->widthMap || game->map[joueur->y][joueur->x+i]) break;
-                else check_ghost(game, joueur, i);
+            distance--;
+        }
+        break;
+    case 1:
+        while (distance >= 0)
+        {
+            if (joueur->x + 1 >= game->widthMap || game->map[joueur->y][joueur->x + 1])
+                break;
+            else
+            {
+                pthread_mutex_lock(&verrou);
+                joueur->x += 1;
+                pthread_mutex_unlock(&verrou);
+                check_ghost(game, joueur);
             }
-            joueur->x+=i;
-            break;
-        case 2:
-            for (i = 0; i <= distance; ++i) {
-                printf("%d cond 1; %d cond 2\n",joueur->y-i,game->map[joueur->y-i][joueur->x]);
-                if (joueur->y-i<=0 || game->map[joueur->y-i][joueur->x]) break;
-                else check_ghost(game, joueur, i);
+            distance--;
+        }
+        break;
+    case 2:
+        while (distance >= 0)
+        {
+            if (joueur->y - 1 < 0 || game->map[joueur->y - 1][joueur->x])
+                break;
+            else
+            {
+                pthread_mutex_lock(&verrou);
+                joueur->y -= 1;
+                pthread_mutex_unlock(&verrou);
+                check_ghost(game, joueur);
             }
-            joueur->y-=i;
-            break;
-        case 3:
-            for (i = 0; i <= distance; ++i) {
-                printf("%d cond 1; %d cond 2\n",joueur->x-i,game->map[joueur->y][joueur->x-i]);
-                if (joueur->x-i<=0 || game->map[joueur->y][joueur->x-i]) break;
-                else check_ghost(game, joueur, i);
+            distance--;
+        }
+        break;
+    case 3:
+        while (distance >= 0)
+        {
+            if (joueur->x - 1 < 0 || game->map[joueur->y][joueur->x - 1])
+                break;
+            else
+            {
+                pthread_mutex_lock(&verrou);
+                joueur->x -= 1;
+                pthread_mutex_unlock(&verrou);
+                check_ghost(game, joueur);
             }
-            joueur->x-=i;
-            break;
+            distance--;
+        }
+        break;
     }
-    //pthread_mutex_unlock(&verrou);
 }
 
-void generic_move(void* entity, int isGhost, game *game){
+void generic_move(void *entity, int isGhost, game *game)
+{
     int new_x, new_y;
-    //pthread_mutex_lock(&verrou);
-    do{
-        new_x=(rand()%(game->widthMap));
-        new_y=(rand()%(game->heightMap));
-    }while (game->map[new_y][new_x]);
+    // pthread_mutex_lock(&verrou);
+    do
+    {
+        new_x = (rand() % (game->widthMap));
+        new_y = (rand() % (game->heightMap));
+    } while (game->map[new_y][new_x]);
 
-    if (isGhost){
-        ((fantome *)entity)->x=new_x;
-        ((fantome *)entity)->y=new_y;
-    }else{
-        ((joueur *)entity)->x=new_x;
-        ((joueur *)entity)->y=new_y;
+    if (isGhost)
+    {
+        ((fantome *)entity)->x = new_x;
+        ((fantome *)entity)->y = new_y;
     }
-    //pthread_mutex_unlock(&verrou);
+    else
+    {
+        ((joueur *)entity)->x = new_x;
+        ((joueur *)entity)->y = new_y;
+    }
+    // pthread_mutex_unlock(&verrou);
 }
 
 /**
@@ -81,47 +118,55 @@ void generic_move(void* entity, int isGhost, game *game){
  * @param fantome
  * @param game
  */
-void init_pos_player(joueur* player, game *game){
+void init_pos_player(joueur *player, game *game)
+{
     generic_move(player, 0, game);
-    //pthread_mutex_lock(&verrou);
+    // pthread_mutex_lock(&verrou);
     //éviter les collisions
-    element* el=game->fantomes->first;
-    while (el!=NULL){
-        if (((fantome *)el->data)->x == player->x && ((fantome*)el->data)->y == player->y){
+    element *el = game->fantomes->first;
+    while (el != NULL)
+    {
+        if (((fantome *)el->data)->x == player->x && ((fantome *)el->data)->y == player->y)
+        {
             init_pos_player(player, game);
         }
-        el=el->next;
+        el = el->next;
     }
-    el=game->joueurs->first;
-    while (el!=NULL){
-        if (((joueur*)el->data)->x == player->x && ((joueur*)el->data)->y == player->y
-        && player!=((joueur *)el->data)){
+    el = game->joueurs->first;
+    while (el != NULL)
+    {
+        if (((joueur *)el->data)->x == player->x && ((joueur *)el->data)->y == player->y && player != ((joueur *)el->data))
+        {
             init_pos_player(player, game);
         }
-        el=el->next;
+        el = el->next;
     }
-    //pthread_mutex_unlock(&verrou);
+    // pthread_mutex_unlock(&verrou);
 }
 
-void no_collision(void (*mov)(fantome* fantome,game *game), fantome* fantom, game *game){
-    //pthread_mutex_lock(&verrou);
-    element* el=game->joueurs->first;
-    while (el!=NULL){
-        if (((joueur*)el->data)->x == fantom->x && ((joueur*)el->data)->y == fantom->y){
+void no_collision(void (*mov)(fantome *fantome, game *game), fantome *fantom, game *game)
+{
+    // pthread_mutex_lock(&verrou);
+    element *el = game->joueurs->first;
+    while (el != NULL)
+    {
+        if (((joueur *)el->data)->x == fantom->x && ((joueur *)el->data)->y == fantom->y)
+        {
             mov(fantom, game);
         }
-        el=el->next;
+        el = el->next;
     }
 
-    el=game->fantomes->first;
-    while (el!=NULL){
-        if (((fantome *)el->data)->x == fantom->x && ((fantome*)el->data)->y == fantom->y
-        && fantom!=((fantome *)el->data)){
+    el = game->fantomes->first;
+    while (el != NULL)
+    {
+        if (((fantome *)el->data)->x == fantom->x && ((fantome *)el->data)->y == fantom->y && fantom != ((fantome *)el->data))
+        {
             mov(fantom, game);
         }
-        el=el->next;
+        el = el->next;
     }
-    //pthread_mutex_unlock(&verrou);
+    // pthread_mutex_unlock(&verrou);
 }
 
 /**
@@ -129,7 +174,8 @@ void no_collision(void (*mov)(fantome* fantome,game *game), fantome* fantom, gam
  * @param fantome
  * @param game
  */
-void ghost_move(fantome* fantome, game *game){
+void ghost_move(fantome *fantome, game *game)
+{
     generic_move(fantome, 1, game);
     no_collision(ghost_move, fantome, game);
 }
@@ -139,7 +185,8 @@ void ghost_move(fantome* fantome, game *game){
  * @param fantome
  * @param game
  */
-void init_ghost_move(fantome* fantome, game *game){
+void init_ghost_move(fantome *fantome, game *game)
+{
     generic_move(fantome, 1, game);
     no_collision(init_ghost_move, fantome, game);
 }

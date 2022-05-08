@@ -46,7 +46,9 @@ void initGhost(game *game_current)
         init_ghost_move(ghost, game_current);
         addEl(game_current->fantomes, game_current->fantomes->first, ghost);
         element *ptr = game_current->fantomes->first;
-        for (int i = 0; i < 19; i++)
+        srand(time(NULL));
+        int r=rand()%30;
+        for (int i = 0; i < r; i++)
         {
             fantome *g = malloc(sizeof(fantome));
             g->score = 15 * (i % 4 + 1);

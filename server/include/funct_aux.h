@@ -5,6 +5,7 @@
 #include "joueur.h"
 #include "entity_position.h"
 #include "labyrinthe.h"
+#include "time.h"
 
 // NEWPL
 joueur* new_game(int sock2,listElements *games);
