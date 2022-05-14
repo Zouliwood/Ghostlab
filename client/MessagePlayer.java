@@ -194,11 +194,11 @@ class MessagePlayer {
 
                         byte[] portb = new byte[4];
                         System.arraycopy(response, 32, portb, 0, 4);
-                        int portMultiDiff = ByteBuffer.wrap(converting(portb)).getChar();
+                        int portMultiDiff = Integer.parseInt(new String(portb, StandardCharsets.UTF_8));
 
                         System.out.println("La partie " + idGame + " a pour hauteur " + heightMap + ", largeur "
                                 + widthMap + ", nombre de fantomes " + nbrGhost + ", adresse ip de multidiffusion "
-                                + ipMultiDiff + " et port de multi diffusion " + portMultiDiff);
+                                + ipMultiDiff + " et port de multidiffusion " + portMultiDiff);
                         return new PlayerMulticast(ipMultiDiff, portMultiDiff);
                     }
                 }

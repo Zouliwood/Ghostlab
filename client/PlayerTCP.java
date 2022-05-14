@@ -52,17 +52,18 @@ public class PlayerTCP implements Runnable{
             mp.initPlayer();
 
             String clientUDP = "-1";
-            while (Integer.parseInt(clientUDP)>9999 || Integer.parseInt(clientUDP)<0) {
+            while (clientUDP.equals("-1")) {
                 System.out.println("Veuillez saisir votre port (4 chiffres):");
                 try {
                     clientUDP = new Scanner(System.in).nextLine();
-                } catch (InputMismatchException e) {
+                    if (Integer.parseInt(clientUDP)>9999 || Integer.parseInt(clientUDP)<0) clientUDP="-1";
+                } catch (Exception e) {
                     clientUDP = "-1";
                 }
             }
 
             int UDPClient=Integer.parseInt(clientUDP);
-            (new PlayerUDP(UDPClient)).run();
+            //TODO: (new PlayerUDP(UDPClient)).run();
 
             PlayerMulticast multicastP=null;
 
@@ -98,6 +99,7 @@ public class PlayerTCP implements Runnable{
                             }
                         }
                         flag = mp.joinGame(clientUDP, idGame);
+                        idGame=-1;//refaire une boucle en cas d'erreur
                     } else {
                         flag = false;
                         status = execOtherCmd(ot, in, mp, 1);
@@ -120,7 +122,7 @@ public class PlayerTCP implements Runnable{
                     }
                     if (startGame == 0) {
                         multicastP=mp.readyPlay();
-                        multicastP.run();
+                        //TODO: multicastP.run();
                         flag = mp.getposIT();
                         if (flag) hist.newGame();
                     } else {
