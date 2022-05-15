@@ -123,6 +123,7 @@ public class PlayerTCP implements Runnable{
                     if (startGame == 0) {
                         multicastP=mp.readyPlay();
                         //TODO: multicastP.run();
+
                         flag = mp.getposIT();
                         if (flag) hist.newGame();
                     } else {

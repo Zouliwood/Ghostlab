@@ -72,26 +72,6 @@ joueur *new_game(int sock2, listElements *games)
     j1->score = 0;
     j1->x = -1;
     j1->y = -1;
-    // récuperation IP
-    struct sockaddr_in addr;
-    socklen_t addr_size = sizeof(struct sockaddr_in);
-    if (getpeername(sock2, (struct sockaddr *)&addr, &addr_size) == -1)
-    {
-        printf("Couldn't get ip");
-    }
-    struct in_addr temp;
-    temp.s_addr = addr.sin_addr.s_addr;
-    char *res = inet_ntoa(temp);
-    if (res != NULL)
-    {
-        memset(j1->ip, '#', 15);
-        memmove(j1->ip, res, strlen(res));
-    }
-    else
-    {
-        printf("Error while getting ip");
-    }
-
     // création de la partie
     game *new = malloc(sizeof(game));
     new->encours = -1;
@@ -110,6 +90,8 @@ joueur *new_game(int sock2, listElements *games)
     new->fantomes->count = 0;
     new->fantomes->first = NULL;
     new->fantomes->last = NULL;
+    memset(new->ip, '#', 15);
+    memmove(new->ip, "225.1.2.4", 9);
     initGhost(new);
 
     // création du game_id
@@ -138,6 +120,8 @@ joueur *new_game(int sock2, listElements *games)
             pthread_mutex_unlock(&verrou);
         }
     }
+    new->port = (1000 + new->game_id);
+    new->sock_udp = socket(AF_INET, SOCK_DGRAM, 0);
     // ajout du premier joueur
     addEl(new->joueurs, NULL, j1);
     // ajout de la partie dans games
@@ -172,7 +156,7 @@ joueur *register_game(int sock2, listElements *games)
     uint8_t id = *(uint8_t *)(buffer + 15);
     game *_game = get_game(games, id);
     // block if game already started
-    if (!_game || _game->encours==1)
+    if (!_game || _game->encours == 1)
     {
         func_send_regno(sock2);
         return NULL;
@@ -185,25 +169,6 @@ joueur *register_game(int sock2, listElements *games)
     j1->score = 0;
     j1->x = -1;
     j1->y = -1;
-    // récuperation IP
-    struct sockaddr_in addr;
-    socklen_t addr_size = sizeof(struct sockaddr_in);
-    if (getpeername(sock2, (struct sockaddr *)&addr, &addr_size) == -1)
-    {
-        printf("Couldn't get ip");
-    }
-    struct in_addr temp;
-    temp.s_addr = addr.sin_addr.s_addr;
-    char *res = inet_ntoa(temp);
-    if (res != NULL)
-    {
-        memset(j1->ip, '#', 15);
-        memmove(j1->ip, res, strlen(res));
-    }
-    else
-    {
-        printf("Error while getting ip");
-    }
     addEl(_game->joueurs, _game->joueurs->last, j1);
     j1->current = _game;
 
@@ -388,7 +353,7 @@ void send_welco(int sock, joueur *player)
 {
     int taille = SIZE_OF_HEAD + SIZE_OF_END + 16 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2) + 4 + 5;
     char welco_mess[taille];
-    if (player == NULL || player->ip == NULL || player->id == NULL || player->port == NULL)
+    if (player == NULL || player->id == NULL || player->port == NULL)
     {
         printf("Error wrong value for joueurs");
     }
@@ -405,9 +370,9 @@ void send_welco(int sock, joueur *player)
         uint8_t temp = getListCount(player->current->fantomes);
         memmove(welco_mess + SIZE_OF_HEAD + 4 + sizeof(uint8_t) + (sizeof(uint16_t) * 2), &temp, sizeof(uint8_t));
         memmove(welco_mess + SIZE_OF_HEAD + 4 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), " ", 1);
-        memmove(welco_mess + SIZE_OF_HEAD + 5 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), player->ip, 15);
+        memmove(welco_mess + SIZE_OF_HEAD + 5 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), player->current->ip, 15);
         memmove(welco_mess + SIZE_OF_HEAD + 20 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), " ", 1);
-        memmove(welco_mess + SIZE_OF_HEAD + 21 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), player->port, 4);
+        sprintf(welco_mess + SIZE_OF_HEAD + 21 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), "%04d", player->current->port);
         memmove(welco_mess + SIZE_OF_HEAD + 25 + (sizeof(uint8_t) * 2) + (sizeof(uint16_t) * 2), END_TCP, SIZE_OF_END);
         if (taille != send(sock, welco_mess, taille, 0))
         {
@@ -608,29 +573,61 @@ int getGameStart(game *game)
     return res;
 }
 
-int sendMess(int sock, joueur *me){
-    int size_buffer = 200+SIZE_OF_END+8+2;
+int sendMess(int sock, joueur *me)
+{
+    int size_buffer = 200 + SIZE_OF_END + 8 + 2;
     char buffer[size_buffer];
-    int count=recv(sock,buffer,size_buffer,0);
+    int count = recv(sock, buffer, size_buffer, 0);
     char id2[9];
-    memmove(id2,buffer+1,8);
-    id2[8]='\0';
+    memmove(id2, buffer + 1, 8);
+    id2[8] = '\0';
     pthread_mutex_lock(&verrou);
-    element *ptr =me->current->joueurs->first;
+    element *ptr = me->current->joueurs->first;
     pthread_mutex_unlock(&verrou);
-    for(int i =0;i<getListCount(me->current->joueurs);i++)
+    for (int i = 0; i < getListCount(me->current->joueurs); i++)
     {
-        if(strcmp(((joueur *)ptr->data)->id,id2)==0){
+        if (strcmp(((joueur *)ptr->data)->id, id2) == 0)
+        {
             break;
         }
-        if((i+1)==getListCount(me->current->joueurs))
+        if ((i + 1) == getListCount(me->current->joueurs))
         {
             return -1;
         }
         pthread_mutex_lock(&verrou);
-        ptr=ptr->next;
+        ptr = ptr->next;
         pthread_mutex_unlock(&verrou);
     }
-    
+    int size_message = count - 10 - SIZE_OF_END;
+    char message[size_message];
+    memmove(message, buffer + 10, size_message);
 
+    struct addrinfo *first_info;
+    struct addrinfo hints;
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_DGRAM;
+    // récuperation IP
+    struct sockaddr_in addr;
+    socklen_t addr_size = sizeof(struct sockaddr_in);
+    if (getpeername(sock, (struct sockaddr *)&addr, &addr_size) == -1)
+    {
+        printf("Couldn't get ip");
+    }
+    struct in_addr temp;
+    temp.s_addr = addr.sin_addr.s_addr;
+    char *res = inet_ntoa(temp);
+    if (res == NULL)
+    {
+        printf("Error while getting ip");
+    }
+    int r = getaddrinfo(res,((joueur *)ptr->data)->port, &hints, &first_info);
+    if (r == 0)
+    {
+        if (first_info != NULL)
+        {
+            struct sockaddr *saddr = first_info->ai_addr;
+            sendto(me->current->sock_udp,message,size_message,0,saddr,(socklen_t)sizeof(struct sockaddr_in));
+        }
+    }
 }

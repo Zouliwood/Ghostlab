@@ -19,6 +19,9 @@ struct game
     listElements *fantomes;
     uint16_t heightMap;
     uint16_t widthMap;
+    int port;
+    char ip[15];
+    int sock_udp;
 };
 typedef struct game game;
 

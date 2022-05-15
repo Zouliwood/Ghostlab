@@ -12,8 +12,11 @@ void check_ghost(game *game, joueur *joueur)
     {
         if (((fantome *)el->data)->x == joueur->x && ((fantome *)el->data)->y == joueur->y)
         {
+            pthread_mutex_lock(&verrou);
             joueur->score += ((fantome *)el->data)->score;
+            pthread_mutex_unlock(&verrou);
             // TODO: UDP
+            free((fantome *)el->data);
             removeEl(game->fantomes, el);
             break; // 1 fantome par case au plus
         }
