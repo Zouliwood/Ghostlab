@@ -35,6 +35,8 @@ void movPlayer(int sock,int direction,joueur *joueur,listElements *games);
 void quit_game(int sock, joueur *player, listElements* games);
 // GLIS!
 void send_glis(int sock,joueur *player);
+//SEND!
+int sendMess(int sock, joueur *me);
 // lock
 uint8_t getListCount(listElements* list);
 int getGameStart(game *game);

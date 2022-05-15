@@ -202,6 +202,9 @@ void *client_thread(void *socket)
             else if (strcmp(SENDC, command) == 0)
             {
                 // SEND?_id_mess
+                if(1==sendMess(sock2,me)){
+                    //TODO
+                }else ;
             }
             else
             {

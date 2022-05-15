@@ -463,8 +463,6 @@ void movPlayer(int sock, int dir, joueur *joueur, listElements *games)
     printf("x: %d y: %d\n", joueur->x, joueur->y);
     player_move(game, dir, joueur, atoi(distance));
     printf("x: %d y: %d\n", joueur->x, joueur->y);
-    // TODO: [MOVEF x y p***]
-    // TODO: use lock
 
     //[MOVE! x y ***]
     taille = SIZE_OF_HEAD + 2 + 6 + SIZE_OF_END;
@@ -608,4 +606,31 @@ int getGameStart(game *game)
     int res = game->start;
     pthread_mutex_unlock(&verrou);
     return res;
+}
+
+int sendMess(int sock, joueur *me){
+    int size_buffer = 200+SIZE_OF_END+8+2;
+    char buffer[size_buffer];
+    int count=recv(sock,buffer,size_buffer,0);
+    char id2[9];
+    memmove(id2,buffer+1,8);
+    id2[8]='\0';
+    pthread_mutex_lock(&verrou);
+    element *ptr =me->current->joueurs->first;
+    pthread_mutex_unlock(&verrou);
+    for(int i =0;i<getListCount(me->current->joueurs);i++)
+    {
+        if(strcmp(((joueur *)ptr->data)->id,id2)==0){
+            break;
+        }
+        if((i+1)==getListCount(me->current->joueurs))
+        {
+            return -1;
+        }
+        pthread_mutex_lock(&verrou);
+        ptr=ptr->next;
+        pthread_mutex_unlock(&verrou);
+    }
+    
+
 }
