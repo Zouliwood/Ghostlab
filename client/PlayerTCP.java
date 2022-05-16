@@ -7,21 +7,18 @@ import java.util.Scanner;
 
 public class PlayerTCP implements Runnable{
 
-    private Historique hist;
+    private final Historique hist;
     private final String hostName;
     private final int port;
-    private final String fileName;
+    private final String pseudoClient;
+    private final String clientUDP;
 
-    public PlayerTCP(String hostName, int port) {
+    public PlayerTCP(String hostName, int port, String pseudoClient, String clientUDP, Historique hist) {
         this.port = port;
         this.hostName = hostName;
-        this.fileName = "";
-    }
-
-    public PlayerTCP(String hostName, int port, String fileName) {
-        this.port = port;
-        this.hostName = hostName;
-        this.fileName = fileName;
+        this.pseudoClient=pseudoClient;
+        this.clientUDP=clientUDP;
+        this.hist=hist;
     }
 
     @Override
@@ -30,46 +27,12 @@ public class PlayerTCP implements Runnable{
             Socket socket = new Socket(hostName, port);
             DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
             DataOutputStream ot = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-
-            String pseudoClient = "";
-            try (FileInputStream fis = new FileInputStream(this.fileName);
-                 ObjectInputStream ois = new ObjectInputStream(fis)) {
-                hist = (Historique) ois.readObject();
-                pseudoClient = hist.getPseudo();
-                System.out.println("Votre fichier a été chargé correctement.");
-            } catch (IOException e) {
-                System.out.println("Aucun fichier de sauvegarde valide n'a été choisi.");
-                while (pseudoClient.length() != 8 || pseudoClient.matches(".*\\W+.*")) {
-                    System.out.println("Veuillez saisir votre pseudo (8 charactères alphanumériques):");
-                    pseudoClient = new Scanner(System.in).nextLine();
-                }
-                hist=new Historique();
-                hist.setPseudo(pseudoClient);
-            }
-
             MessagePlayer mp = new MessagePlayer(ot, in, pseudoClient);
-
+            //TODO: remvd
             mp.initPlayer();
-
-            String clientUDP = "-1";
-            while (clientUDP.equals("-1")) {
-                System.out.println("Veuillez saisir votre port (4 chiffres):");
-                try {
-                    clientUDP = new Scanner(System.in).nextLine();
-                    if (Integer.parseInt(clientUDP)>9999 || Integer.parseInt(clientUDP)<0) clientUDP="-1";
-                } catch (Exception e) {
-                    clientUDP = "-1";
-                }
-            }
-
-            int UDPClient=Integer.parseInt(clientUDP);
-            //TODO: (new PlayerUDP(UDPClient)).run();
-
-            PlayerMulticast multicastP=null;
-
             //user information has been registered correctly
+            PlayerMulticast multicastP=null;
             int status = 1;
-
             int idGame = -1;
             while (true) {
                 if (status == 1) {
@@ -122,7 +85,7 @@ public class PlayerTCP implements Runnable{
                     }
                     if (startGame == 0) {
                         multicastP=mp.readyPlay();
-                        //TODO: multicastP.run();
+                        multicastP.run();
 
                         flag = mp.getposIT();
                         if (flag) hist.newGame();
