@@ -194,6 +194,7 @@ void *client_thread(void *socket)
                     printf("not end tcp %s\n", buffer);
                 }
                 quit_game(sock2, me, games);
+                me=NULL;
                 break;
             }
             else if (strcmp(GLISC, command) == 0)
@@ -227,11 +228,14 @@ void *client_thread(void *socket)
             {
                 func_send_dunno(sock2);
             }
-        }   
+        }
     }
-    char poubelle[300];
-    recv(sock2,poubelle,300,0);
-    quit_game(sock2,me,games);
+    if (me != NULL)
+    {
+        char poubelle[300];
+        recv(sock2, poubelle, 300, 0);
+        quit_game(sock2, me, games);
+    }
     close(sock2);
     return NULL;
 }
