@@ -623,3 +623,19 @@ int sendMess(int sock, joueur *me)
         }
     }
 }
+
+void sendc(int sock,int true)
+{
+    int taille = SIZE_OF_END+SIZE_OF_HEAD;
+    char mess[taille];
+    if(true==1)
+    {
+        memmove(mess,"SEND!***",taille);
+    }else{
+        memmove(mess,"NSEND***",taille);
+    } 
+    if(taille!=send(sock, mess, taille, 0))
+    {
+        printf("Error while send send!\n");
+    }  
+}
