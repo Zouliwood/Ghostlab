@@ -428,10 +428,7 @@ void movPlayer(int sock, int dir, joueur *joueur, listElements *games)
 
     char distance[3];
     memmove(distance, buffer + 1, 3);
-    printf("%d\n", atoi(distance));
-    printf("x: %d y: %d\n", joueur->x, joueur->y);
     player_move(game, dir, joueur, atoi(distance));
-    printf("x: %d y: %d\n", joueur->x, joueur->y);
 
     //[MOVE! x y ***]
     taille = SIZE_OF_HEAD + 2 + 6 + SIZE_OF_END;
@@ -578,7 +575,10 @@ int sendMess(int sock, joueur *me)
     pthread_mutex_unlock(&verrou);
     for (int i = 0; i < getListCount(me->current->joueurs); i++)
     {
-        if (strcmp(((joueur *)ptr->data)->id, id2) == 0)
+        char id[9];
+        memmove(id,((joueur *)ptr->data)->id,8);
+        id[8]='\0';
+        if (strcmp(id, id2) == 0)
         {
             break;
         }
@@ -604,14 +604,16 @@ int sendMess(int sock, joueur *me)
     socklen_t addr_size = sizeof(struct sockaddr_in);
     if (getpeername(sock, (struct sockaddr *)&addr, &addr_size) == -1)
     {
-        printf("Couldn't get ip");
+        printf("Couldn't get ip\n");
+        return -1;
     }
     struct in_addr temp;
     temp.s_addr = addr.sin_addr.s_addr;
     char *res = inet_ntoa(temp);
     if (res == NULL)
     {
-        printf("Error while getting ip");
+        printf("Error while getting ip\n");
+        return -1;
     }
     int r = getaddrinfo(res,((joueur *)ptr->data)->port, &hints, &first_info);
     if (r == 0)
@@ -620,8 +622,10 @@ int sendMess(int sock, joueur *me)
         {
             struct sockaddr *saddr = first_info->ai_addr;
             sendto(me->current->sock_udp,message,size_message,0,saddr,(socklen_t)sizeof(struct sockaddr_in));
+            printf("J'ai envoyé le message udp\n");
         }
     }
+    return 1;
 }
 
 void sendc(int sock,int true)

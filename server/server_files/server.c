@@ -150,13 +150,13 @@ void *client_thread(void *socket)
     }
     if (lockGameStatus(me->current) == 1)
     {
-        printf("WELCOME\n");
         send_welco(sock2, me);
         while (lockGameStatus(me->current) == 1)
         {
             char command[SIZE_OF_HEAD + 1];
             int count = recv(sock2, command, SIZE_OF_HEAD, 0);
             command[count] = '\0';
+            printf("count= %d and command= %s\n", count, command);
             if (strcmp(UPMOV, command) == 0)
             {
                 printf("UP ");
@@ -217,6 +217,7 @@ void *client_thread(void *socket)
             else if (strcmp(SENDC, command) == 0)
             {
                 // SEND?_id_mess
+                printf("In send\n");
                 sendc(sock2,sendMess(sock2, me));
             }
             else
