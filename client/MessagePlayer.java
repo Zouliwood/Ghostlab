@@ -190,7 +190,7 @@ class MessagePlayer {
 
                         byte[] ipb = new byte[15];
                         System.arraycopy(response, 16, ipb, 0, 15);
-                        String ipMultiDiff = new String(ipb, StandardCharsets.UTF_8);
+                        String ipMultiDiff = (new String(ipb, StandardCharsets.UTF_8)).replace("#","");
 
                         byte[] portb = new byte[4];
                         System.arraycopy(response, 32, portb, 0, 4);

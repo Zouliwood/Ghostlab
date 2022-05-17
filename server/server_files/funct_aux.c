@@ -120,7 +120,7 @@ joueur *new_game(int sock2, listElements *games)
             pthread_mutex_unlock(&verrou);
         }
     }
-    new->port = (1000 + new->game_id);
+    new->port = (1023 + new->game_id);
     new->sock_udp = socket(AF_INET, SOCK_DGRAM, 0);
     // ajout du premier joueur
     addEl(new->joueurs, NULL, j1);
