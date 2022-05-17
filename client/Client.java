@@ -30,7 +30,7 @@ public class Client {
             System.out.println("Veuillez saisir votre port (4 chiffres):");
             try {
                 clientUDP = new Scanner(System.in).nextLine();
-                if (Integer.parseInt(clientUDP)>9999 || Integer.parseInt(clientUDP)<0) clientUDP="-1";
+                if (Integer.parseInt(clientUDP)>9999 || Integer.parseInt(clientUDP)<1023) clientUDP="-1";
             } catch (Exception e) {
                 clientUDP = "-1";
             }

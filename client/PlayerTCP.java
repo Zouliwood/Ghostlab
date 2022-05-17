@@ -85,7 +85,7 @@ public class PlayerTCP implements Runnable{
                     }
                     if (startGame == 0) {
                         multicastP=mp.readyPlay();
-                        multicastP.run();
+                        //TODO: multicastP.run();
 
                         flag = mp.getposIT();
                         if (flag) hist.newGame();
