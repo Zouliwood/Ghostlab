@@ -181,9 +181,9 @@ public class PlayerTCP implements Runnable{
                             }
                             if (gameActn == 3) {
                                 String destPlayer = "-";
-                                while (destPlayer.matches(".*\\W+.*")) {
+                                while (destPlayer.length() != 8 || destPlayer.matches(".*\\W+.*")) {
                                     System.out.println("Veillez entrez un destinataire (characters alphanumérique)");
-                                    messagePlayer = new Scanner(System.in).nextLine();
+                                    destPlayer = new Scanner(System.in).nextLine();
                                 }
                                 flag = mp.messOnePlayer(messagePlayer, destPlayer);
                             } else flag = mp.messAllPlayer(messagePlayer);
