@@ -459,7 +459,6 @@ void movPlayer(int sock, int dir, joueur *joueur, listElements *games)
 
 void quit_game(int sock, joueur *player, listElements *games)
 {
-    printf("I'm here\n");
     // execution du iquit
     if (!player->current)
     {
