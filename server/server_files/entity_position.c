@@ -96,7 +96,6 @@ void player_move(game *game, int direction, joueur *joueur, int distance)
 void generic_move(void *entity, int isGhost, game *game)
 {
     int new_x, new_y;
-    // pthread_mutex_lock(&verrou);
     do
     {
         new_x = (rand() % (game->widthMap));
@@ -113,7 +112,6 @@ void generic_move(void *entity, int isGhost, game *game)
         ((joueur *)entity)->x = new_x;
         ((joueur *)entity)->y = new_y;
     }
-    // pthread_mutex_unlock(&verrou);
 }
 
 /**

@@ -179,6 +179,20 @@ void *client_thread(void *socket)
             }
             else if (strcmp(IQUIT, command) == 0)
             {
+                // on vérifie que le protocole est respecté
+                int taille = SIZE_OF_END;
+                char buffer[taille + 1];
+                if (taille != recv(sock2, buffer, taille, 0))
+                {
+                    func_send_dunno(sock2);
+                    printf("%d\n", taille);
+                }
+                buffer[3] = '\0';
+                if (strcmp(buffer, END_TCP) != 0)
+                {
+                    func_send_dunno(sock2);
+                    printf("not end tcp %s\n", buffer);
+                }
                 quit_game(sock2, me, games);
                 break;
             }
@@ -202,16 +216,22 @@ void *client_thread(void *socket)
             else if (strcmp(SENDC, command) == 0)
             {
                 // SEND?_id_mess
-                if(1==sendMess(sock2,me)){
-                    //TODO
-                }else ;
+                if (1 == sendMess(sock2, me))
+                {
+                    // TODO
+                }
+                else
+                    ;
             }
             else
             {
                 func_send_dunno(sock2);
             }
-        }
+        }   
     }
+    char poubelle[300];
+    recv(sock2,poubelle,300,0);
+    quit_game(sock2,me,games);
     close(sock2);
     return NULL;
 }

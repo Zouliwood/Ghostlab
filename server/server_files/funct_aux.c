@@ -339,9 +339,11 @@ void get_size_map(int sock, listElements *games)
         memmove(response + SIZE_OF_HEAD, " ", 1);
         memmove(response + SIZE_OF_HEAD + 1, &game_id, sizeof(uint8_t));
         memmove(response + SIZE_OF_HEAD + 1 + sizeof(uint8_t), " ", 1);
-        memmove(response + SIZE_OF_HEAD + 2 + sizeof(uint8_t), &el->heightMap, sizeof(uint16_t));
+        uint16_t h =ntohs(el->heightMap);
+        memmove(response + SIZE_OF_HEAD + 2 + sizeof(uint8_t), &h, sizeof(uint16_t));
         memmove(response + SIZE_OF_HEAD + 2 + sizeof(uint8_t) + sizeof(uint16_t), " ", 1);
-        memmove(response + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + sizeof(uint16_t), &el->widthMap, sizeof(uint16_t));
+        uint16_t w =ntohs(el->widthMap);
+        memmove(response + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + sizeof(uint16_t),&w, sizeof(uint16_t));
         memmove(response + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + sizeof(uint16_t) * 2, END_TCP, SIZE_OF_END);
         int count = send(sock, response, size, 0);
         if (count != size)
@@ -363,9 +365,11 @@ void send_welco(int sock, joueur *player)
         memmove(welco_mess + SIZE_OF_HEAD, " ", 1);
         memmove(welco_mess + SIZE_OF_HEAD + 1, &player->current->game_id, sizeof(uint8_t));
         memmove(welco_mess + SIZE_OF_HEAD + 1 + sizeof(uint8_t), " ", 1);
-        memmove(welco_mess + SIZE_OF_HEAD + 2 + sizeof(uint8_t), &player->current->heightMap, sizeof(uint16_t));
+        uint16_t h=ntohs(player->current->heightMap);
+        memmove(welco_mess + SIZE_OF_HEAD + 2 + sizeof(uint8_t), &h, sizeof(uint16_t));
         memmove(welco_mess + SIZE_OF_HEAD + 2 + sizeof(uint8_t) + sizeof(uint16_t), " ", 1);
-        memmove(welco_mess + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + sizeof(uint16_t), &player->current->widthMap, sizeof(uint16_t));
+        uint16_t w=ntohs(player->current->widthMap);
+        memmove(welco_mess + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + sizeof(uint16_t), &w, sizeof(uint16_t));
         memmove(welco_mess + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + (sizeof(uint16_t) * 2), " ", 1);
         uint8_t temp = getListCount(player->current->fantomes);
         memmove(welco_mess + SIZE_OF_HEAD + 4 + sizeof(uint8_t) + (sizeof(uint16_t) * 2), &temp, sizeof(uint8_t));
@@ -444,7 +448,10 @@ void movPlayer(int sock, int dir, joueur *joueur, listElements *games)
         printf("Coudln't send list!");
     if (game->fantomes->count == 0)
     {
-        // TODO traiter fin de la game
+        // TODO mutlicast
+        pthread_mutex_lock(&verrou);
+        joueur->current->encours = 1;
+        pthread_mutex_unlock(&verrou);
     }
     else
         movGhost(game);
@@ -452,23 +459,9 @@ void movPlayer(int sock, int dir, joueur *joueur, listElements *games)
 
 void quit_game(int sock, joueur *player, listElements *games)
 {
-    // on vérifie que le protocole est respecté
-    int taille = SIZE_OF_END;
-    char buffer[taille + 1];
-    if (taille != recv(sock, buffer, taille, 0))
-    {
-        func_send_dunno(sock);
-        printf("%d\n", taille);
-    }
-    buffer[3] = '\0';
-    if (strcmp(buffer, END_TCP) != 0)
-    {
-        func_send_dunno(sock);
-        printf("not end tcp %s\n", buffer);
-    }
-    printf("ALL GOOD\n");
+    printf("I'm here\n");
     // execution du iquit
-    if (player->current != NULL)
+    if (!player->current)
     {
         int joueurs_in_game = getListCount(player->current->joueurs);
         if (joueurs_in_game == 1)
