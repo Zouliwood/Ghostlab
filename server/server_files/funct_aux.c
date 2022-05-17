@@ -120,7 +120,7 @@ joueur *new_game(int sock2, listElements *games)
             pthread_mutex_unlock(&verrou);
         }
     }
-    new->port = (1000 + new->game_id);
+    new->port = (1023 + new->game_id);
     new->sock_udp = socket(AF_INET, SOCK_DGRAM, 0);
     // ajout du premier joueur
     addEl(new->joueurs, NULL, j1);
@@ -339,10 +339,10 @@ void get_size_map(int sock, listElements *games)
         memmove(response + SIZE_OF_HEAD, " ", 1);
         memmove(response + SIZE_OF_HEAD + 1, &game_id, sizeof(uint8_t));
         memmove(response + SIZE_OF_HEAD + 1 + sizeof(uint8_t), " ", 1);
-        uint16_t h =ntohs(el->heightMap);
+        uint16_t h =htole16(el->heightMap);
         memmove(response + SIZE_OF_HEAD + 2 + sizeof(uint8_t), &h, sizeof(uint16_t));
         memmove(response + SIZE_OF_HEAD + 2 + sizeof(uint8_t) + sizeof(uint16_t), " ", 1);
-        uint16_t w =ntohs(el->widthMap);
+        uint16_t w =htole16(el->widthMap);
         memmove(response + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + sizeof(uint16_t),&w, sizeof(uint16_t));
         memmove(response + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + sizeof(uint16_t) * 2, END_TCP, SIZE_OF_END);
         int count = send(sock, response, size, 0);
@@ -365,10 +365,10 @@ void send_welco(int sock, joueur *player)
         memmove(welco_mess + SIZE_OF_HEAD, " ", 1);
         memmove(welco_mess + SIZE_OF_HEAD + 1, &player->current->game_id, sizeof(uint8_t));
         memmove(welco_mess + SIZE_OF_HEAD + 1 + sizeof(uint8_t), " ", 1);
-        uint16_t h=ntohs(player->current->heightMap);
+        uint16_t h=htole16(player->current->heightMap);
         memmove(welco_mess + SIZE_OF_HEAD + 2 + sizeof(uint8_t), &h, sizeof(uint16_t));
         memmove(welco_mess + SIZE_OF_HEAD + 2 + sizeof(uint8_t) + sizeof(uint16_t), " ", 1);
-        uint16_t w=ntohs(player->current->widthMap);
+        uint16_t w=htole16(player->current->widthMap);
         memmove(welco_mess + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + sizeof(uint16_t), &w, sizeof(uint16_t));
         memmove(welco_mess + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + (sizeof(uint16_t) * 2), " ", 1);
         uint8_t temp = getListCount(player->current->fantomes);

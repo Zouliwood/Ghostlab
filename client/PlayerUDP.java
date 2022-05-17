@@ -16,10 +16,13 @@ public class PlayerUDP implements Runnable {
         try {
             DatagramSocket dso=new DatagramSocket(port);
             while(true){
-                //
+                //TODO: debug
                 byte[]data=new byte[65535];//taille max possible avec DatagramPacket
+                System.out.println("okkay1");
                 DatagramPacket paquet=new DatagramPacket(data,data.length);
+                System.out.println("okkay2");
                 dso.receive(paquet);
+                System.out.println("okkay3");
                 String st=new String(paquet.getData(),0,paquet.getLength());
                 if (st.startsWith("MESSP ")){
                     String idSender=st.substring(6, 14);
