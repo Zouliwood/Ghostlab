@@ -334,22 +334,15 @@ class MessagePlayer {
             if (response == null)
                 throw new NullPointerException();
             String responseString = new String(response, StandardCharsets.UTF_8);
-            switch (responseString) {
-                case "SEND!" + END_TCP: {
-                    System.out.print("Le message a bien été envoyé");
-                    break;
-                }
-                case "NSEND" + END_TCP: {
-                    System.out.print("Le message n'a pas pu être envoyé");
-                    break;
-                }
-                case "GOBYE" + END_TCP: {
-                    System.out.println("La partie est terminé");
-                    return true;
-                }
-                default: {
-                    System.out.println(Error.requestClient);
-                }
+            if (responseString.startsWith("SEND!" + END_TCP)){
+                System.out.println("Le message a bien été envoyé");
+            }else if(responseString.startsWith("NSEND" + END_TCP)){
+                System.out.println("Le message n'a pas pu être envoyé");
+            }else if(responseString.startsWith("GOBYE" + END_TCP)){
+                System.out.println("La partie est terminé");
+            }else{
+                System.out.println(responseString);//TODO: debug
+                System.out.println(Error.requestClient);
             }
         } catch (NullPointerException e) {
             System.out.println(Error.responseServ);
