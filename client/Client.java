@@ -40,8 +40,8 @@ public class Client {
 
         if (args.length == 2 || args.length == 3) {
             try {
-                (new PlayerTCP(args[0], Integer.parseInt(args[1]), pseudoClient, clientUDP, hist)).run();
-                (new PlayerUDP(UDPClient)).run();
+                new Thread((new PlayerTCP(args[0], Integer.parseInt(args[1]), pseudoClient, clientUDP, hist))).start();
+                new Thread((new PlayerUDP(UDPClient))).start();
             } catch (Exception e) {
                 e.printStackTrace();
             }
