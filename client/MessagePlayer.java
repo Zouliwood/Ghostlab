@@ -294,11 +294,11 @@ class MessagePlayer {
 
     // TODO: que faire si wait un long moment + gerer cas erreur default
 
-    // [MAIL? mess***]
+    // [MALL? mess***]
     public boolean messAllPlayer(String message) {
         try {
             // request
-            String s = "MAIL? " + message + " " + END_TCP;
+            String s = "MALL? " + message + END_TCP;
             byte[] request = s.getBytes();
             this.ot.write(request);
             this.ot.flush();
@@ -307,7 +307,7 @@ class MessagePlayer {
             if (response == null)
                 throw new NullPointerException();
             String responseString = new String(response, StandardCharsets.UTF_8);
-            if (responseString.equals("MAIL!" + END_TCP))
+            if (responseString.equals("MALL!" + END_TCP))
                 System.out.print("Le message a bien été envoyé");
             else if (responseString.equals("GOBYE" + END_TCP)) {
                 System.out.println("La partie est terminé");
@@ -326,7 +326,7 @@ class MessagePlayer {
     // [SEND? id mess***]
     public boolean messOnePlayer(String message, String idPlayerDest) {
         try {
-            String s = "SEND? " + idPlayerDest + " " + message + " " + END_TCP;
+            String s = "SEND? " + idPlayerDest + " " + message + END_TCP;
             byte[] request = s.getBytes();
             this.ot.write(request);
             this.ot.flush();
@@ -339,7 +339,7 @@ class MessagePlayer {
                     System.out.print("Le message a bien été envoyé");
                     break;
                 }
-                case "NSEND!" + END_TCP: {
+                case "NSEND" + END_TCP: {
                     System.out.print("Le message n'a pas pu être envoyé");
                     break;
                 }
