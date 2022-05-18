@@ -36,12 +36,9 @@ public class Client {
             }
         }
 
-        int UDPClient=Integer.parseInt(clientUDP);
-
         if (args.length == 2 || args.length == 3) {
             try {
                 new Thread((new PlayerTCP(args[0], Integer.parseInt(args[1]), pseudoClient, clientUDP, hist))).start();
-                new Thread((new PlayerUDP(UDPClient))).start();
             } catch (Exception e) {
                 e.printStackTrace();
             }
