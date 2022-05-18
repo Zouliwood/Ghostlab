@@ -3,7 +3,7 @@
 
 extern pthread_mutex_t verrou;
 
-void check_ghost(game *game, joueur *joueur)
+void check_ghost(game *game, joueur *joueur, int sock)
 {
     pthread_mutex_lock(&verrou);
     element *el = game->fantomes->first;
@@ -15,7 +15,23 @@ void check_ghost(game *game, joueur *joueur)
             pthread_mutex_lock(&verrou);
             joueur->score += ((fantome *)el->data)->score;
             pthread_mutex_unlock(&verrou);
-            // TODO: UDP
+            // creation message udp
+            int size_mess = SIZE_OF_HEAD + SIZE_OF_END + 8 + 3 + 3 + 4 + 4;
+            char fantome_taken[size_mess + 1];
+
+            memmove(fantome_taken, "SCORE", SIZE_OF_HEAD);
+            memmove(fantome_taken + SIZE_OF_HEAD, " ", 1);
+            memmove(fantome_taken + SIZE_OF_HEAD + 1, joueur->id, 8);
+            memmove(fantome_taken + SIZE_OF_HEAD + 9, " ", 1);
+            sprintf(fantome_taken + SIZE_OF_HEAD + 10, "%04d", joueur->score);
+            memmove(fantome_taken + SIZE_OF_HEAD + 14, " ", 1);
+            sprintf(fantome_taken + SIZE_OF_HEAD + 15, "%03d", joueur->x);
+            memmove(fantome_taken + SIZE_OF_HEAD + 18, " ", 1);
+            sprintf(fantome_taken + SIZE_OF_HEAD + 19, "%03d", joueur->y);
+            memmove(fantome_taken + SIZE_OF_HEAD + 22, "+++", SIZE_OF_END);
+
+            fantome_taken[size_mess] = '\0';
+            sendMulticast(joueur->current, fantome_taken);
             free((fantome *)el->data);
             removeEl(game->fantomes, el);
             break; // 1 fantome par case au plus
@@ -26,7 +42,7 @@ void check_ghost(game *game, joueur *joueur)
     }
 }
 
-void player_move(game *game, int direction, joueur *joueur, int distance)
+void player_move(game *game, int direction, joueur *joueur, int distance, int sock)
 {
     switch (direction)
     {
@@ -40,7 +56,7 @@ void player_move(game *game, int direction, joueur *joueur, int distance)
                 pthread_mutex_lock(&verrou);
                 joueur->y += 1;
                 pthread_mutex_unlock(&verrou);
-                check_ghost(game, joueur);
+                check_ghost(game, joueur, sock);
             }
             distance--;
         }
@@ -55,7 +71,7 @@ void player_move(game *game, int direction, joueur *joueur, int distance)
                 pthread_mutex_lock(&verrou);
                 joueur->x += 1;
                 pthread_mutex_unlock(&verrou);
-                check_ghost(game, joueur);
+                check_ghost(game, joueur, sock);
             }
             distance--;
         }
@@ -70,7 +86,7 @@ void player_move(game *game, int direction, joueur *joueur, int distance)
                 pthread_mutex_lock(&verrou);
                 joueur->y -= 1;
                 pthread_mutex_unlock(&verrou);
-                check_ghost(game, joueur);
+                check_ghost(game, joueur, sock);
             }
             distance--;
         }
@@ -85,7 +101,7 @@ void player_move(game *game, int direction, joueur *joueur, int distance)
                 pthread_mutex_lock(&verrou);
                 joueur->x -= 1;
                 pthread_mutex_unlock(&verrou);
-                check_ghost(game, joueur);
+                check_ghost(game, joueur, sock);
             }
             distance--;
         }

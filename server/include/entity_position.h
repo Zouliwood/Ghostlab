@@ -6,13 +6,14 @@
 #include "game.h"
 #include "joueur.h"
 #include "fantome.h"
+#include "funct_aux.h"
 
 #define TOP 0
 #define RIGHT 1
 #define BOTTOM 2
 #define LEFT 3
 
-void player_move(game *game, int direction, joueur* joueur, int distance);
+void player_move(game *game, int direction, joueur* joueur, int distance,int sock);
 void ghost_move(fantome* fantome, game *game);
 void init_pos_player(joueur* joueur, game *game);
 void init_ghost_move(fantome* fantome, game *game);

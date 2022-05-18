@@ -40,7 +40,7 @@ int sendMess(int sock, joueur *me);
 //SEND! or NSEND
 void sendc(int sock,int true);
 //MULTICAST
-void sendMulticast(int sock,joueur *me,char *mess);
+void sendMulticast(game *current,char *mess);
 //MALL?
 void send_all(int sock, joueur *me);
 // lock

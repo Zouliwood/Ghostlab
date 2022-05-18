@@ -47,7 +47,7 @@ void initGhost(game *game_current)
         addEl(game_current->fantomes, game_current->fantomes->first, ghost);
         element *ptr = game_current->fantomes->first;
         srand(time(NULL));
-        int r=rand()%30;
+        int r=rand()%10;
         for (int i = 0; i < r; i++)
         {
             fantome *g = malloc(sizeof(fantome));
@@ -69,8 +69,31 @@ void movGhost(game *game_current)
         element *ptr = game_current->fantomes->first;
         for (int i = 0; i < game_current->fantomes->count; i++)
         {
-            ghost_move((fantome*)ptr->data, game_current);
+            fantome *current =(fantome*)ptr->data; 
+            int x=current->x;
+            int y=current->y;
+            ghost_move(current, game_current);
+            if(x!=current->x || y!=current->y)
+            {
+                int size=SIZE_OF_HEAD+SIZE_OF_END+3+3+2;
+                char ghost_mov[size+1];
+                memmove(ghost_mov,"GHOST",SIZE_OF_HEAD);
+                memmove(ghost_mov+SIZE_OF_HEAD," ",1);
+                sprintf(ghost_mov+SIZE_OF_HEAD+1,"%03d",current->x);
+                memmove(ghost_mov+SIZE_OF_HEAD+4," ",1);
+                sprintf(ghost_mov+SIZE_OF_HEAD+5,"%03d",current->y);
+                memmove(ghost_mov+SIZE_OF_HEAD+8,"+++",3);
+                ghost_mov[size]='\0';
+                sendMulticast(game_current,ghost_mov);
+            }
+            pthread_mutex_lock(&verrou);
             ptr = ptr->next;
+            pthread_mutex_unlock(&verrou);
         }
     }
 }
+
+/*joueur *getWinner(game *current)
+{
+    
+}*/
