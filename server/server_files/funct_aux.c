@@ -1,4 +1,5 @@
 #include "funct_aux.h"
+#include <errno.h>
 
 extern pthread_mutex_t verrou;
 
@@ -339,11 +340,11 @@ void get_size_map(int sock, listElements *games)
         memmove(response + SIZE_OF_HEAD, " ", 1);
         memmove(response + SIZE_OF_HEAD + 1, &game_id, sizeof(uint8_t));
         memmove(response + SIZE_OF_HEAD + 1 + sizeof(uint8_t), " ", 1);
-        uint16_t h =htole16(el->heightMap);
+        uint16_t h = htole16(el->heightMap);
         memmove(response + SIZE_OF_HEAD + 2 + sizeof(uint8_t), &h, sizeof(uint16_t));
         memmove(response + SIZE_OF_HEAD + 2 + sizeof(uint8_t) + sizeof(uint16_t), " ", 1);
-        uint16_t w =htole16(el->widthMap);
-        memmove(response + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + sizeof(uint16_t),&w, sizeof(uint16_t));
+        uint16_t w = htole16(el->widthMap);
+        memmove(response + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + sizeof(uint16_t), &w, sizeof(uint16_t));
         memmove(response + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + sizeof(uint16_t) * 2, END_TCP, SIZE_OF_END);
         int count = send(sock, response, size, 0);
         if (count != size)
@@ -365,10 +366,10 @@ void send_welco(int sock, joueur *player)
         memmove(welco_mess + SIZE_OF_HEAD, " ", 1);
         memmove(welco_mess + SIZE_OF_HEAD + 1, &player->current->game_id, sizeof(uint8_t));
         memmove(welco_mess + SIZE_OF_HEAD + 1 + sizeof(uint8_t), " ", 1);
-        uint16_t h=htole16(player->current->heightMap);
+        uint16_t h = htole16(player->current->heightMap);
         memmove(welco_mess + SIZE_OF_HEAD + 2 + sizeof(uint8_t), &h, sizeof(uint16_t));
         memmove(welco_mess + SIZE_OF_HEAD + 2 + sizeof(uint8_t) + sizeof(uint16_t), " ", 1);
-        uint16_t w=htole16(player->current->widthMap);
+        uint16_t w = htole16(player->current->widthMap);
         memmove(welco_mess + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + sizeof(uint16_t), &w, sizeof(uint16_t));
         memmove(welco_mess + SIZE_OF_HEAD + 3 + sizeof(uint8_t) + (sizeof(uint16_t) * 2), " ", 1);
         uint8_t temp = getListCount(player->current->fantomes);
@@ -576,8 +577,8 @@ int sendMess(int sock, joueur *me)
     for (int i = 0; i < getListCount(me->current->joueurs); i++)
     {
         char id[9];
-        memmove(id,((joueur *)ptr->data)->id,8);
-        id[8]='\0';
+        memmove(id, ((joueur *)ptr->data)->id, 8);
+        id[8] = '\0';
         if (strcmp(id, id2) == 0)
         {
             break;
@@ -591,14 +592,10 @@ int sendMess(int sock, joueur *me)
         pthread_mutex_unlock(&verrou);
     }
     int size_message = count - 10 - SIZE_OF_END;
-    char message[size_message];
+    char message[size_message + 1];
     memmove(message, buffer + 10, size_message);
+    message[size_message] = '\0';
 
-    struct addrinfo *first_info;
-    struct addrinfo hints;
-    memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_DGRAM;
     // récuperation IP
     struct sockaddr_in addr;
     socklen_t addr_size = sizeof(struct sockaddr_in);
@@ -615,31 +612,44 @@ int sendMess(int sock, joueur *me)
         printf("Error while getting ip\n");
         return -1;
     }
-    int r = getaddrinfo(res,((joueur *)ptr->data)->port, &hints, &first_info);
+    // UDP
+    struct addrinfo *first_info;
+    struct addrinfo hints;
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_DGRAM;
+    char port[5];
+    memmove(port, ((joueur *)ptr->data)->port, 4);
+    port[4] = '\0';
+    int r = getaddrinfo(res, port, &hints, &first_info);
     if (r == 0)
     {
         if (first_info != NULL)
         {
             struct sockaddr *saddr = first_info->ai_addr;
-            sendto(me->current->sock_udp,message,size_message,0,saddr,(socklen_t)sizeof(struct sockaddr_in));
-            printf("J'ai envoyé le message udp\n");
+            sendto(me->current->sock_udp, message, size_message, 0,
+                   saddr, (socklen_t)sizeof(struct sockaddr_in));
+            printf("Message envoyé : %s à l'ip: %s,r= %d\n", message, res, r);
+            return 1;
         }
     }
-    return 1;
+    return -1;
 }
 
-void sendc(int sock,int true)
+void sendc(int sock, int true)
 {
-    int taille = SIZE_OF_END+SIZE_OF_HEAD;
+    int taille = SIZE_OF_END + SIZE_OF_HEAD;
     char mess[taille];
-    if(true==1)
+    if (true == 1)
     {
-        memmove(mess,"SEND!***",taille);
-    }else{
-        memmove(mess,"NSEND***",taille);
-    } 
-    if(taille!=send(sock, mess, taille, 0))
+        memmove(mess, "SEND!***", taille);
+    }
+    else
+    {
+        memmove(mess, "NSEND***", taille);
+    }
+    if (taille != send(sock, mess, taille, 0))
     {
         printf("Error while send send!\n");
-    }  
+    }
 }

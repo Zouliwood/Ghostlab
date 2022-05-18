@@ -217,7 +217,6 @@ void *client_thread(void *socket)
             else if (strcmp(SENDC, command) == 0)
             {
                 // SEND?_id_mess
-                printf("In send\n");
                 sendc(sock2,sendMess(sock2, me));
             }
             else
