@@ -3,18 +3,22 @@ package client;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Socket;
 
 public class PlayerUDP implements Runnable {
+
     private final int port;
+    private DatagramSocket dso;
 
     public PlayerUDP(int port) {
         this.port = port;
+        dso=null;
     }
 
     @Override
     public void run() {
         try {
-            DatagramSocket dso=new DatagramSocket(port);
+            dso=new DatagramSocket(port);
             while(true){
                 //TODO: debug
                 byte[]data=new byte[65535];//taille max possible avec DatagramPacket
@@ -31,9 +35,13 @@ public class PlayerUDP implements Runnable {
                 }else System.out.println(Error.responseServ);
             }
 
-            //TODO: close udp?
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Socket UDP close");
         }
     }
+
+    public void close(){
+        dso.close();
+    }
+
 }

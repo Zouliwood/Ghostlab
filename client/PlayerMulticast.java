@@ -6,23 +6,24 @@ import java.net.MulticastSocket;
 
 public class PlayerMulticast implements Runnable{
 
-    private volatile boolean stop;
     private final String hostName;
     private final int port;
+    private MulticastSocket mso;
+
     public PlayerMulticast(String hostName, int port) {
         this.port = port;
         this.hostName = hostName;
-        this.stop=false;
+        mso=null;
     }
 
     @Override
     public void run() {
         try{
-            MulticastSocket mso=new MulticastSocket(port);
+            mso=new MulticastSocket(port);
             mso.joinGroup(InetAddress.getByName(hostName));
             byte[]data=new byte[65535];//max size udp/multicast
             DatagramPacket paquet=new DatagramPacket(data,data.length);
-            while(!this.stop){
+            while(true){
                 mso.receive(paquet);
                 String responseString=new String(paquet.getData(),0,paquet.getLength());
                 String header=responseString.substring(0, 5);
@@ -55,14 +56,13 @@ public class PlayerMulticast implements Runnable{
                     }
                 }
             }
-            mso.close();
         } catch(Exception e){
-            e.printStackTrace();
+            System.out.println("Socket Multicast close");
         }
     }
 
     public void close(){
-        this.stop=true;
+        mso.close();
     }
 
 }

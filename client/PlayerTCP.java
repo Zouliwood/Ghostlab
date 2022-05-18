@@ -31,7 +31,15 @@ public class PlayerTCP implements Runnable{
             //TODO: remvd
             mp.initPlayer();
             //user information has been registered correctly
+
+            int UDPClient=Integer.parseInt(clientUDP);
+            PlayerUDP pUDP=new PlayerUDP(UDPClient);
+            Thread udpT = new Thread(pUDP);
+            udpT.start();
+
+            Thread multiT=null;
             PlayerMulticast multicastP=null;
+
             int status = 1;
             int idGame = -1;
             while (true) {
@@ -85,7 +93,8 @@ public class PlayerTCP implements Runnable{
                     }
                     if (startGame == 0) {
                         multicastP=mp.readyPlay();
-                        new Thread(multicastP).start();
+                        multiT=new Thread(multicastP);
+                        multiT.start();
 
                         flag = mp.getposIT();
                         if (flag) hist.newGame();
@@ -152,12 +161,8 @@ public class PlayerTCP implements Runnable{
                             } else flag = mp.messAllPlayer(messagePlayer);
                         }
                     } while (!flag);
-                    //fin de la partie
-                    hist.endGame();
-                    saveData();
-                    socket.close();
-                    if (multicastP!=null)multicastP.close();
-                    //TODO: re connecter le client et ne pas break
+                    endGame(socket, multicastP, multiT, pUDP, udpT);
+                    //TODO: re connecter le client et ne pas break?
                     status = 1;
                     break;
                 }
@@ -171,6 +176,26 @@ public class PlayerTCP implements Runnable{
 //-------------------------Aux Function---------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
 
+
+    public void endGame(Socket socket, PlayerMulticast multicastP, Thread multiT, PlayerUDP pUDP, Thread udpT) throws Exception {
+        //fin de la partie
+        //save data
+        hist.endGame();
+        saveData();
+
+        //close tcp
+        socket.close();
+
+        //close multicast
+        if (multicastP != null){
+            multicastP.close();
+            multiT.interrupt();
+        }
+
+        //close udp
+        pUDP.close();
+        udpT.interrupt();
+    }
 
     public int execOtherCmd(DataOutputStream ot, DataInputStream in, MessagePlayer mp, int status) {
         String propositionCmdPlayer = "";
