@@ -591,9 +591,14 @@ int sendMess(int sock, joueur *me)
         ptr = ptr->next;
         pthread_mutex_unlock(&verrou);
     }
-    int size_message = count - 10 - SIZE_OF_END;
+    int size_message = count +SIZE_OF_HEAD;
     char message[size_message + 1];
-    memmove(message, buffer + 10, size_message);
+    memmove(message,"MESSP",SIZE_OF_HEAD);
+    memmove(message+SIZE_OF_HEAD," ",1);
+    memmove(message+SIZE_OF_HEAD+1,me->id,8);
+    memmove(message+SIZE_OF_HEAD+9," ",1);
+    memmove(message+SIZE_OF_HEAD+10, buffer + 10, (count-13));
+    memmove(message+SIZE_OF_HEAD+count-3,"+++",SIZE_OF_END);
     message[size_message] = '\0';
 
     // récuperation IP
@@ -629,7 +634,6 @@ int sendMess(int sock, joueur *me)
             struct sockaddr *saddr = first_info->ai_addr;
             sendto(me->current->sock_udp, message, size_message, 0,
                    saddr, (socklen_t)sizeof(struct sockaddr_in));
-            printf("Message envoyé : %s à l'ip: %s,r= %d\n", message, res, r);
             return 1;
         }
     }
