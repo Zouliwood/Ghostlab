@@ -399,16 +399,15 @@ void send_posit(int sock, joueur *joueur)
     sprintf(reponse + SIZE_OF_HEAD + 14, "%03d", joueur->y);
     memmove(reponse + SIZE_OF_HEAD + 17, END_TCP, SIZE_OF_END);
     reponse[taille] = '\0';
-    printf("%s\n", reponse);
     if (taille != send(sock, reponse, taille, 0))
     {
         printf("Coudln't send POSIT\n");
     }
 }
 
-void movPlayer(int sock, int dir, joueur *joueur, listElements *games)
+void movPlayer(int sock, int dir, joueur *player, listElements *games)
 {
-    game *game = joueur->current;
+    game *game = player->current;
     int taille = 1 + 3 + SIZE_OF_END;
     char buffer[taille];
     if (taille != recv(sock, buffer, taille, 0))
@@ -428,34 +427,33 @@ void movPlayer(int sock, int dir, joueur *joueur, listElements *games)
 
     char distance[3];
     memmove(distance, buffer + 1, 3);
-    player_move(game, dir, joueur, atoi(distance),sock);
+    player_move(game, dir, player, atoi(distance),sock);
 
     //[MOVE! x y ***]
     taille = SIZE_OF_HEAD + 2 + 6 + SIZE_OF_END;
     char games_mess[taille + 1];
     memmove(games_mess, MOVES, SIZE_OF_HEAD);
     memmove(games_mess + SIZE_OF_HEAD, " ", 1);
-    sprintf(games_mess + SIZE_OF_HEAD + 1, "%03d", joueur->x);
+    sprintf(games_mess + SIZE_OF_HEAD + 1, "%03d", player->x);
     memmove(games_mess + SIZE_OF_HEAD + 4, " ", 1);
-    sprintf(games_mess + SIZE_OF_HEAD + 5, "%03d", joueur->y);
+    sprintf(games_mess + SIZE_OF_HEAD + 5, "%03d", player->y);
     memmove(games_mess + SIZE_OF_HEAD + 8, END_TCP, SIZE_OF_END);
     games_mess[taille] = '\0';
-    printf("%s\n", games_mess);
     if (taille != send(sock, games_mess, taille, 0))
         printf("Coudln't send list!");
     if (game->fantomes->count == 0)
     {
         pthread_mutex_lock(&verrou);
-        joueur->current->encours = 2;
+        player->current->encours = 2;
         pthread_mutex_unlock(&verrou);
         int size_endgame= SIZE_OF_HEAD+SIZE_OF_END+8+4+2;
         char endgame[size_endgame];
+        joueur *winner = getWinner(game);
         memmove(endgame,"ENDGA",SIZE_OF_HEAD);
         memmove(endgame+SIZE_OF_HEAD," ",1);
-        // TODO get winner
-        memmove(endgame+SIZE_OF_HEAD+1,"WINNER01",8);
+        memmove(endgame+SIZE_OF_HEAD+1,winner->id,8);
         memmove(endgame+SIZE_OF_HEAD+9," ",1);
-        sprintf(endgame+10+SIZE_OF_HEAD,"%04d",1000);
+        sprintf(endgame+10+SIZE_OF_HEAD,"%04d",winner->score);
         memmove(endgame+14+SIZE_OF_HEAD,"+++",3);
         sendMulticast(game,endgame);
     }

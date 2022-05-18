@@ -93,7 +93,28 @@ void movGhost(game *game_current)
     }
 }
 
-/*joueur *getWinner(game *current)
+joueur *getWinner(game *current)
 {
-    
-}*/
+    if(current->joueurs->count>1)
+    {
+        pthread_mutex_lock(&verrou);
+        element *max=current->joueurs->first;
+        element *ptr=current->joueurs->first->next;
+        pthread_mutex_unlock(&verrou);
+        for(int i =0;i <getListCount(current->joueurs)-1;i++)
+        {
+            if(((joueur *)ptr->data)->score>((joueur *)max->data)->score)
+            {
+                max=ptr;
+            }
+            pthread_mutex_lock(&verrou);
+            ptr=ptr->next;
+            pthread_mutex_unlock(&verrou);
+        }
+        return (joueur *)max->data;
+
+    }else
+    {
+        return (joueur *)current->joueurs->first->data;
+    }
+}

@@ -47,7 +47,7 @@ void player_move(game *game, int direction, joueur *joueur, int distance, int so
     switch (direction)
     {
     case 0:
-        while (distance >= 0)
+        while (distance > 0)
         {
             if (joueur->y + 1 >= game->heightMap || game->map[joueur->y + 1][joueur->x])
                 break;

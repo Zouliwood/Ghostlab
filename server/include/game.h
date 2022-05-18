@@ -9,6 +9,7 @@
 #include "fantome.h"
 
 
+
 struct game
 {
     uint8_t game_id;
@@ -26,10 +27,12 @@ struct game
 typedef struct game game;
 
 #include "entity_position.h"
+#include "joueur.h"
 
 game *get_game(listElements *games,uint8_t game_id);
 void freeGame(game *ptr);
 void initGhost(game *game_current);
 void movGhost(game *game_current);
+joueur *getWinner(game *current);
 
 #endif
