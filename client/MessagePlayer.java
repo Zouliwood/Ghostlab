@@ -305,9 +305,9 @@ class MessagePlayer {
             if (response == null)
                 throw new NullPointerException();
             String responseString = new String(response, StandardCharsets.UTF_8);
-            if (responseString.equals("MALL!" + END_TCP))
+            if (responseString.startsWith("MALL!" + END_TCP))
                 System.out.println("Le message a bien été envoyé.");
-            else if (responseString.equals("GOBYE" + END_TCP)) {
+            else if (responseString.startsWith("GOBYE" + END_TCP)) {
                 System.out.println("La partie est terminée.");
                 return true;
             } else
@@ -523,7 +523,7 @@ class MessagePlayer {
                     } else
                         System.out.println(Error.responseServ);
                 }
-            } else if (responseString.equals("GOBYE" + END_TCP)) {
+            } else if (responseString.startsWith("GOBYE" + END_TCP)) {
                 System.out.println("La partie est terminée.");
                 return true;
             } else
