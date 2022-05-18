@@ -20,7 +20,7 @@ struct game
     uint16_t heightMap;
     uint16_t widthMap;
     int port;
-    char ip[15];
+    char ip[16];
     int sock_udp;
 };
 typedef struct game game;

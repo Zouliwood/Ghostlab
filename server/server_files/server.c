@@ -213,6 +213,7 @@ void *client_thread(void *socket)
             else if (strcmp(MALLC, command) == 0)
             {
                 // MALL?
+                send_all(sock2,me);
             }
             else if (strcmp(SENDC, command) == 0)
             {

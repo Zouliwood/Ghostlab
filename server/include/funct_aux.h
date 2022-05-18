@@ -39,6 +39,10 @@ void send_glis(int sock,joueur *player);
 int sendMess(int sock, joueur *me);
 //SEND! or NSEND
 void sendc(int sock,int true);
+//MULTICAST
+void sendMulticast(int sock,joueur *me,char *mess);
+//MALL?
+void send_all(int sock, joueur *me);
 // lock
 uint8_t getListCount(listElements* list);
 int getGameStart(game *game);

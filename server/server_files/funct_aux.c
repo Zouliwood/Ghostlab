@@ -93,6 +93,7 @@ joueur *new_game(int sock2, listElements *games)
     new->fantomes->last = NULL;
     memset(new->ip, '#', 15);
     memmove(new->ip, "225.1.2.4", 9);
+    new->ip[15]='\0';
     initGhost(new);
 
     // création du game_id
@@ -563,6 +564,50 @@ int getGameStart(game *game)
     return res;
 }
 
+void send_all(int sock, joueur *me)
+{
+    char mess[205];
+    int count=recv(sock,mess,204,0);
+    int size_mess=SIZE_OF_HEAD+SIZE_OF_END+8+2+count-4;
+    char mess_broadcast[size_mess+1];
+    memmove(mess_broadcast,"MESSA",SIZE_OF_HEAD);
+    memmove(mess_broadcast+SIZE_OF_HEAD," ",1);
+    memmove(mess_broadcast+1+SIZE_OF_HEAD,me->id,8);
+    memmove(mess_broadcast+9+SIZE_OF_HEAD," ",1);
+    memmove(mess_broadcast+10+SIZE_OF_HEAD,mess+1,count-3);
+    memmove(mess_broadcast+10+count-4+SIZE_OF_HEAD,"+++",SIZE_OF_END);
+    mess_broadcast[size_mess]='\0';
+    sendMulticast(sock,me,mess_broadcast);
+    count = send(sock,"MALL!***",SIZE_OF_END+SIZE_OF_HEAD,0);
+    if(count!=SIZE_OF_HEAD+SIZE_OF_END)printf("Error while sending MALL!\n");
+}
+
+void sendMulticast(int sock, joueur *me, char *mess)
+{
+    // send mess multicast
+    char port[5];
+    sprintf(port,"%04d",me->current->port);
+    port[4]='\0';
+    struct addrinfo *first_info;
+    struct addrinfo hints;
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_DGRAM;
+    int r = getaddrinfo("225.1.2.4",port, &hints, &first_info);
+    if (r == 0)
+    {
+        if (first_info != NULL)
+        {
+            struct sockaddr *saddr = first_info->ai_addr;
+            sendto(me->current->sock_udp,mess, strlen(mess), 0, saddr, (socklen_t)sizeof(struct sockaddr_in));
+        }
+    }
+    else
+    {
+        printf("Error while getting multicast addresse\n");
+    }
+}
+
 int sendMess(int sock, joueur *me)
 {
     int size_buffer = 200 + SIZE_OF_END + 8 + 2;
@@ -591,14 +636,14 @@ int sendMess(int sock, joueur *me)
         ptr = ptr->next;
         pthread_mutex_unlock(&verrou);
     }
-    int size_message = count +SIZE_OF_HEAD;
+    int size_message = count + SIZE_OF_HEAD;
     char message[size_message + 1];
-    memmove(message,"MESSP",SIZE_OF_HEAD);
-    memmove(message+SIZE_OF_HEAD," ",1);
-    memmove(message+SIZE_OF_HEAD+1,me->id,8);
-    memmove(message+SIZE_OF_HEAD+9," ",1);
-    memmove(message+SIZE_OF_HEAD+10, buffer + 10, (count-13));
-    memmove(message+SIZE_OF_HEAD+count-3,"+++",SIZE_OF_END);
+    memmove(message, "MESSP", SIZE_OF_HEAD);
+    memmove(message + SIZE_OF_HEAD, " ", 1);
+    memmove(message + SIZE_OF_HEAD + 1, me->id, 8);
+    memmove(message + SIZE_OF_HEAD + 9, " ", 1);
+    memmove(message + SIZE_OF_HEAD + 10, buffer + 10, (count - 13));
+    memmove(message + SIZE_OF_HEAD + count - 3, "+++", SIZE_OF_END);
     message[size_message] = '\0';
 
     // récuperation IP
