@@ -22,7 +22,7 @@ public class Historique implements Serializable {
         Timer.stop();
         System.out.println(Timer.timeToString());
         this.totalTimeInGame += Timer.getDuree();
-        System.out.println("Temps total de jeu: " + this.totalTimeInGame);
+        System.out.println("Temps de jeu total : " + this.totalTimeInGame);
     }
 
     private static class Timer {
@@ -57,7 +57,7 @@ public class Historique implements Serializable {
             int minutes = (int) (((duree / 1000) % 3600) / 60);
             int secondes = (int) ((duree / 1000) % 60);
 
-            String response = "Durée de la partie: ";
+            String response = "Durée de la partie : ";
 
             if (hours > 0) {
                 response += hours + " h ";

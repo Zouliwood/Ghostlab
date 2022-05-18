@@ -18,7 +18,7 @@ public class Client {
         } catch (Exception e) {
             System.out.println("Aucun fichier de sauvegarde valide n'a été choisi.");
             while (pseudoClient.length() != 8 || pseudoClient.matches(".*\\W+.*")) {
-                System.out.println("Veuillez saisir votre pseudo (8 charactères alphanumériques):");
+                System.out.println("Veuillez saisir votre pseudo (8 caractères alphanumériques):");
                 pseudoClient = new Scanner(System.in).nextLine();
             }
             hist=new Historique();

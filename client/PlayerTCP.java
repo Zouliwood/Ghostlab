@@ -62,7 +62,7 @@ public class PlayerTCP implements Runnable{
                         flag = mp.createGame(clientUDP);
                     } else if (gameChoice == 1) {
                         while (idGame < 0 || idGame > 255) {
-                            System.out.println("Entrez le numéro de la partie que vous souhaitez rejoindre:");
+                            System.out.println("Entrez le numéro de la partie que vous souhaitez rejoindre (de 0 à 255):");
                             try {
                                 idGame = new Scanner(System.in).nextInt();
                             } catch (InputMismatchException e) {
@@ -110,9 +110,9 @@ public class PlayerTCP implements Runnable{
                         int gameActn = -1;
                         while (gameActn != 0 && gameActn != 1 && gameActn != 2 && gameActn != 3 && gameActn != 4) {
                             System.out.println(
-                                    "Abbandonner la partie [0]\n" +
+                                    "Abandonner la partie [0]\n" +
                                             "Demander la liste des joueurs présents [1]\n" +
-                                            "Envoyer un essage à tous les joueurs [2]\n" +
+                                            "Envoyer un message à tous les joueurs [2]\n" +
                                             "Envoyer un message à un seul joueur [3]\n" +
                                             "Réaliser un mouvement [4]:"
                             );
@@ -148,13 +148,13 @@ public class PlayerTCP implements Runnable{
                         } else {
                             String messagePlayer = "-";
                             while (messagePlayer.matches(".*\\W+.*")) {
-                                System.out.println("Veillez entrez un message contenant des characters alphanumérique");
+                                System.out.println("Veuillez entrez un message contenant des caractères alphanumériques :");
                                 messagePlayer = new Scanner(System.in).nextLine();
                             }
                             if (gameActn == 3) {
                                 String destPlayer = "-";
                                 while (destPlayer.length() != 8 || destPlayer.matches(".*\\W+.*")) {
-                                    System.out.println("Veillez entrez un destinataire (characters alphanumérique)");
+                                    System.out.println("Veuillez entrez un destinataire (8 caractères alphanumériques).");
                                     destPlayer = new Scanner(System.in).nextLine();
                                 }
                                 flag = mp.messOnePlayer(messagePlayer, destPlayer);
@@ -168,7 +168,7 @@ public class PlayerTCP implements Runnable{
                 }
             }
         }catch (Exception e) {
-            System.out.println("Status Joueur: "+e);
+            System.out.println("Statut du joueur: "+e);
             e.printStackTrace();
         }
     }
@@ -185,6 +185,7 @@ public class PlayerTCP implements Runnable{
 
         //close tcp
         socket.close();
+        System.out.println("Fin TCP.");
 
         //close multicast
         if (multicastP != null){
@@ -203,7 +204,7 @@ public class PlayerTCP implements Runnable{
             //avant de choisir une partie
             propositionCmdPlayer += "Description de la partie [0]\n";
             propositionCmdPlayer += "Liste des joueurs inscrits [1]\n";
-            propositionCmdPlayer += "Liste des parties en attentes [2]";
+            propositionCmdPlayer += "Liste des parties en attente [2]";
             if (status == 2) {
                 //avant de lancer la partie (start):
                 propositionCmdPlayer += "\nSe désinscrire de la partie [3]:";
@@ -221,7 +222,7 @@ public class PlayerTCP implements Runnable{
         if (resOther == 0 || resOther == 1) {
             int nGame = -1;
             while (nGame < 0 || nGame > 255) {
-                System.out.println("Veillez selectionner une partie (entre 0 et 255):");
+                System.out.println("Veuillez sélectionner une partie (entre 0 et 255):");
                 try {
                     nGame = new Scanner(System.in).nextInt();
                 } catch (InputMismatchException e) {

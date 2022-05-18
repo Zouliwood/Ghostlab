@@ -9,6 +9,8 @@ public class PlayerMulticast implements Runnable{
     private final String hostName;
     private final int port;
     private MulticastSocket mso;
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[31m";
 
     public PlayerMulticast(String hostName, int port) {
         this.port = port;
@@ -31,7 +33,7 @@ public class PlayerMulticast implements Runnable{
                     case "GHOST":{//[GHOST x y +++]
                         String x_pos=responseString.substring(6, 9);
                         String y_pos=responseString.substring(10, 13);
-                        System.out.print("Un fantome est en position: ("+x_pos+","+y_pos+")");
+                        System.out.println(ANSI_RED+"Un fantôme est en position ("+x_pos+","+y_pos+")."+ANSI_RESET);
                         break;
                     }
                     case "SCORE":{//[SCORE id p x y+++]
@@ -39,25 +41,25 @@ public class PlayerMulticast implements Runnable{
                         String pts_player=responseString.substring(15, 19);
                         String x_pos=responseString.substring(20, 23);
                         String y_pos=responseString.substring(24, 27);
-                        System.out.println("Le joueur "+id_player+" a "+pts_player+" points et est en position ("+x_pos+","+y_pos+")");
+                        System.out.println(ANSI_RED+"Le joueur "+id_player+" a "+pts_player+" points et est en position ("+x_pos+","+y_pos+")."+ANSI_RESET);
                         break;
                     }
                     case "MESSA":{//MESSA id mess+++]
                         String id_player=responseString.substring(6, 14);
                         String mess=responseString.substring(15, responseString.length()-3);
-                        System.out.println("Le joueur "+id_player+" a envoyé le message: "+mess);
+                        System.out.println(ANSI_RED+"Le joueur "+id_player+" a envoyé le message: "+mess+"."+ANSI_RESET);
                         break;
                     }
                     case "ENDGA":{//[ENDGA id p+++]
                         String id_player=responseString.substring(6, 14);
                         String pts_player=responseString.substring(15, 19);
-                        System.out.println("Le joueur "+id_player+" a "+pts_player);
+                        System.out.println(ANSI_RED+"Le joueur "+id_player+" a "+pts_player+" points."+ANSI_RESET);
                         break;
                     }
                 }
             }
         } catch(Exception e){
-            System.out.println("Socket Multicast close");
+            System.out.println(ANSI_RED+"Fin multidiffusion."+ANSI_RESET);
         }
     }
 
