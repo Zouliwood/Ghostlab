@@ -22,7 +22,10 @@ public class Historique implements Serializable {
         Timer.stop();
         System.out.println(Timer.timeToString());
         this.totalTimeInGame += Timer.getDuree();
-        System.out.println("Temps de jeu total : " + this.totalTimeInGame);
+        int hours = (int) ((this.totalTimeInGame / 1000) / 3600);
+        int minutes = (int) (((this.totalTimeInGame / 1000) % 3600) / 60);
+        int secondes = (int) ((this.totalTimeInGame / 1000) % 60);
+        System.out.println("Temps de jeu total : "+hours+":"+minutes+":"+secondes);
     }
 
     private static class Timer {

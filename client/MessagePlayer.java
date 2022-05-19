@@ -351,7 +351,12 @@ class MessagePlayer {
     // Deplacement
 
     // [DOMOV d***] [UPMOV d***] [RIMOV d***] [LEMOV d***]
-    public boolean goMove(String move, String nbrCase) {
+    public boolean goMove(int direction, String nbrCase) {
+        String move;
+        if (direction==0) move="DOMOV";
+        else if (direction==1) move="UPMOV";
+        else if (direction==2) move="RIMOV";
+        else move="LEMOV";
         try {
             // request
             requestServMov(move, nbrCase);

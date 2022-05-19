@@ -128,17 +128,22 @@ public class PlayerTCP implements Runnable{
                             boolean flagerror;
                             flag = false;
                             do {
-                                System.out.println("Dans quelle direction souhaitez-vous vous déplacer [UPMOV, RIMOV, DOMOV ou LEMOV]?");
-                                String direction = new Scanner(System.in).nextLine();
-                                System.out.println("De combien de cases souhaitez-vous vous déplacer (nombre composé de 3 chiffres)?");
-                                String distance = new Scanner(System.in).nextLine();
-                                if (direction.equals("DOMOV") || direction.equals("UPMOV") || direction.equals("RIMOV") || direction.equals("LEMOV")) {
+                                System.out.println("Dans quelle direction souhaitez-vous vous déplacer :\n" +
+                                        "Vers le haut [0]\n" +
+                                        "Vers la droite [1]\n" +
+                                        "Vers le bas [2]\n" +
+                                        "Vers la gauche [3]");
+                                int direction = new Scanner(System.in).nextInt();
+                                System.out.println("De combien de cases souhaitez-vous vous déplacer (entre 0 et 999)?");
+                                int distance = new Scanner(System.in).nextInt();
+                                if (direction >= 0 && direction <= 3) {
                                     try {
-                                        if (distance.length() != 3 || Integer.parseInt(distance) > 999 || Integer.parseInt(distance) < 0) {
+                                        if (distance > 999 || distance < 0) {
                                             flagerror = true;
                                         } else {
                                             flagerror = false;
-                                            flag = mp.goMove(direction, distance);
+                                            String distanceStr = String.format("%03d", distance);
+                                            flag = mp.goMove(direction, distanceStr);
                                         }
                                     } catch (NumberFormatException e) {
                                         flagerror = true;
@@ -240,7 +245,7 @@ public class PlayerTCP implements Runnable{
     }
 
     public void saveData() {
-        try (FileOutputStream fos = new FileOutputStream(("historique.ser"));
+        try (FileOutputStream fos = new FileOutputStream(("historique_"+this.pseudoClient+".ser"));
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(hist);
         } catch (IOException e) {

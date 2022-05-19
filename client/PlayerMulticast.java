@@ -53,7 +53,7 @@ public class PlayerMulticast implements Runnable{
                     case "ENDGA":{//[ENDGA id p+++]
                         String id_player=responseString.substring(6, 14);
                         String pts_player=responseString.substring(15, 19);
-                        System.out.println(ANSI_RED+"Le joueur "+id_player+" a "+pts_player+" points."+ANSI_RESET);
+                        System.out.println(ANSI_RED+"FIN DE LA PARTIE!\nLe joueur "+id_player+" a "+pts_player+" points."+ANSI_RESET);
                         break;
                     }
                 }
