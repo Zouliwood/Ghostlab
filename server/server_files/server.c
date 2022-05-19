@@ -159,22 +159,18 @@ void *client_thread(void *socket)
             printf("count= %d and command= %s\n", count, command);
             if (strcmp(UPMOV, command) == 0)
             {
-                printf("UP ");
                 movPlayer(sock2, 0, me, games);
             }
             else if (strcmp(DOMOV, command) == 0)
             {
                 movPlayer(sock2, 2, me, games);
-                printf("DOWN ");
             }
             else if (strcmp(LEMOV, command) == 0)
             {
-                printf("LEFT ");
                 movPlayer(sock2, 3, me, games);
             }
             else if (strcmp(RIMOV, command) == 0)
             {
-                printf("RIGHT ");
                 movPlayer(sock2, 1, me, games);
             }
             else if (strcmp(IQUIT, command) == 0)
@@ -224,6 +220,7 @@ void *client_thread(void *socket)
             {
                 func_send_dunno(sock2);
             }
+            printf("Fantome en jeu %d\n",getListCount(me->current->fantomes));
         }
     }
     if (me != NULL)

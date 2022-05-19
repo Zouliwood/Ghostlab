@@ -84,7 +84,7 @@ void movGhost(game *game_current)
                 sprintf(ghost_mov+SIZE_OF_HEAD+5,"%03d",current->y);
                 memmove(ghost_mov+SIZE_OF_HEAD+8,"+++",3);
                 ghost_mov[size]='\0';
-                sendMulticast(game_current,ghost_mov);
+                sendMulticast(game_current,ghost_mov,size);
             }
             pthread_mutex_lock(&verrou);
             ptr = ptr->next;

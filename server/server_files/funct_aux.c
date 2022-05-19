@@ -77,7 +77,6 @@ joueur *new_game(int sock2, listElements *games)
     game *new = malloc(sizeof(game));
     new->encours = -1;
     new->start = 0;
-    srand(time(NULL));
     new->map = createMap(11,11);
     new->widthMap = 11;
     new->heightMap = 11;
@@ -428,20 +427,18 @@ void movPlayer(int sock, int dir, joueur *player, listElements *games)
     char distance[3];
     memmove(distance, buffer + 1, 3);
     player_move(game, dir, player, atoi(distance),sock);
-
     //[MOVE! x y ***]
     taille = SIZE_OF_HEAD + 2 + 6 + SIZE_OF_END;
-    char games_mess[taille + 1];
+    char games_mess[taille];
     memmove(games_mess, MOVES, SIZE_OF_HEAD);
     memmove(games_mess + SIZE_OF_HEAD, " ", 1);
     sprintf(games_mess + SIZE_OF_HEAD + 1, "%03d", player->x);
     memmove(games_mess + SIZE_OF_HEAD + 4, " ", 1);
     sprintf(games_mess + SIZE_OF_HEAD + 5, "%03d", player->y);
     memmove(games_mess + SIZE_OF_HEAD + 8, END_TCP, SIZE_OF_END);
-    games_mess[taille] = '\0';
     if (taille != send(sock, games_mess, taille, 0))
         printf("Coudln't send list!");
-    if (game->fantomes->count == 0)
+    if (getListCount(game->fantomes) == 0)
     {
         pthread_mutex_lock(&verrou);
         player->current->encours = 2;
@@ -455,7 +452,7 @@ void movPlayer(int sock, int dir, joueur *player, listElements *games)
         memmove(endgame+SIZE_OF_HEAD+9," ",1);
         sprintf(endgame+10+SIZE_OF_HEAD,"%04d",winner->score);
         memmove(endgame+14+SIZE_OF_HEAD,"+++",3);
-        sendMulticast(game,endgame);
+        sendMulticast(game,endgame,size_endgame);
     }
     else
         movGhost(game);
@@ -582,12 +579,12 @@ void send_all(int sock, joueur *me)
     memmove(mess_broadcast+10+SIZE_OF_HEAD,mess+1,count-3);
     memmove(mess_broadcast+10+count-4+SIZE_OF_HEAD,"+++",SIZE_OF_END);
     mess_broadcast[size_mess]='\0';
-    sendMulticast(me->current,mess_broadcast);
+    sendMulticast(me->current,mess_broadcast,size_mess);
     count = send(sock,"MALL!***",SIZE_OF_END+SIZE_OF_HEAD,0);
     if(count!=SIZE_OF_HEAD+SIZE_OF_END)printf("Error while sending MALL!\n");
 }
 
-void sendMulticast(game *current, char *mess)
+void sendMulticast(game *current, char *mess,int size_mess)
 {
     // send mess multicast
     char port[5];
@@ -604,7 +601,7 @@ void sendMulticast(game *current, char *mess)
         if (first_info != NULL)
         {
             struct sockaddr *saddr = first_info->ai_addr;
-            sendto(current->sock_udp,mess, strlen(mess), 0, saddr, (socklen_t)sizeof(struct sockaddr_in));
+            sendto(current->sock_udp,mess, size_mess, 0, saddr, (socklen_t)sizeof(struct sockaddr_in));
         }
     }
     else
