@@ -62,7 +62,7 @@ void player_move(game *game, int direction, joueur *joueur, int distance, int so
         }
         break;
     case 1:
-        while (distance >= 0)
+        while (distance > 0)
         {
             if (joueur->x + 1 >= game->widthMap || game->map[joueur->y][joueur->x + 1])
                 break;
@@ -77,7 +77,7 @@ void player_move(game *game, int direction, joueur *joueur, int distance, int so
         }
         break;
     case 2:
-        while (distance >= 0)
+        while (distance > 0)
         {
             if (joueur->y - 1 < 0 || game->map[joueur->y - 1][joueur->x])
                 break;
@@ -92,7 +92,7 @@ void player_move(game *game, int direction, joueur *joueur, int distance, int so
         }
         break;
     case 3:
-        while (distance >= 0)
+        while (distance > 0)
         {
             if (joueur->x - 1 < 0 || game->map[joueur->y][joueur->x - 1])
                 break;
