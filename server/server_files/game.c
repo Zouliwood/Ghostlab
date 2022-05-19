@@ -76,14 +76,13 @@ void movGhost(game *game_current)
             if(x!=current->x || y!=current->y)
             {
                 int size=SIZE_OF_HEAD+SIZE_OF_END+3+3+2;
-                char ghost_mov[size+1];
+                char ghost_mov[size];
                 memmove(ghost_mov,"GHOST",SIZE_OF_HEAD);
                 memmove(ghost_mov+SIZE_OF_HEAD," ",1);
                 sprintf(ghost_mov+SIZE_OF_HEAD+1,"%03d",current->x);
                 memmove(ghost_mov+SIZE_OF_HEAD+4," ",1);
                 sprintf(ghost_mov+SIZE_OF_HEAD+5,"%03d",current->y);
                 memmove(ghost_mov+SIZE_OF_HEAD+8,"+++",3);
-                ghost_mov[size]='\0';
                 sendMulticast(game_current,ghost_mov,size);
             }
             pthread_mutex_lock(&verrou);

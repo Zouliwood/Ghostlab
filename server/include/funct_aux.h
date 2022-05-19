@@ -44,6 +44,7 @@ void sendMulticast(game *current,char *mess,int size_mess);
 //MALL?
 void send_all(int sock, joueur *me);
 // lock
+int lockGameStatus(game *current);
 uint8_t getListCount(listElements* list);
 int getGameStart(game *game);
 

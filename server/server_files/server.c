@@ -232,12 +232,3 @@ void *client_thread(void *socket)
     close(sock2);
     return NULL;
 }
-
-int lockGameStatus(game *current)
-{
-    int res;
-    pthread_mutex_lock(&verrou);
-    res = current->encours;
-    pthread_mutex_unlock(&verrou);
-    return res;
-}
