@@ -173,15 +173,16 @@ public class PlayerTCP implements Runnable{
                                 } else flagerror = true;
                             } while (flagerror);
                         } else {
-                            String messagePlayer = "-";
-                            while (messagePlayer.matches(".*\\W+.*")) {
-                                System.out.println("Veuillez entrez un message contenant des caractères alphanumériques :");
+                            String messagePlayer = "*+";
+                            while ((messagePlayer.length() > 200 || messagePlayer.length() <=0)
+                                    || messagePlayer.contains("*") || messagePlayer.contains("+")) {
+                                System.out.println("Veuillez entrer un message contenant des caractères (différent de * et +):");
                                 messagePlayer = new Scanner(System.in).nextLine();
                             }
                             if (gameActn == 3) {
                                 String destPlayer = "-";
                                 while (destPlayer.length() != 8 || destPlayer.matches(".*\\W+.*")) {
-                                    System.out.println("Veuillez entrez un destinataire (8 caractères alphanumériques).");
+                                    System.out.println("Veuillez entrer un destinataire (8 caractères alphanumériques).");
                                     destPlayer = new Scanner(System.in).nextLine();
                                 }
                                 flag = mp.messOnePlayer(messagePlayer, destPlayer);
