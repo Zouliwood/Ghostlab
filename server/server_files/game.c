@@ -46,7 +46,6 @@ void initGhost(game *game_current)
         init_ghost_move(ghost, game_current);
         addEl(game_current->fantomes, game_current->fantomes->first, ghost);
         element *ptr = game_current->fantomes->first;
-        srand(time(NULL));
         int r=rand()%10;
         for (int i = 0; i < r; i++)
         {

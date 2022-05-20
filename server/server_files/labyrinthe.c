@@ -132,15 +132,6 @@ int** fillMap(int** arr, int height, int width){
 }
 
 int** createMap(int height, int width){
-    srand(time(NULL));
-
-    //check
-    if (height > MAXMAP || height < MINMAP){
-        height=rand()%(MAXMAP-MINMAP + 1) + MINMAP;
-    }
-    if (width > MAXMAP || width < MINMAP){
-        width=rand()%(MAXMAP-MINMAP + 1) + MINMAP;
-    }
 
     int** arr= initMap(height, width);
 

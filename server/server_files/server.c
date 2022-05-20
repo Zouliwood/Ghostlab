@@ -6,6 +6,7 @@ pthread_mutex_t verrou = PTHREAD_MUTEX_INITIALIZER;
 
 int main(int argc, char const *argv[])
 {
+    srand(time(NULL));
     games = malloc(sizeof(listElements));
     games->count = 0;
     games->first = NULL;
@@ -151,8 +152,11 @@ void *client_thread(void *socket)
     if (lockGameStatus(me->current) == 1)
     {
         send_welco(sock2, me);
-        while (lockGameStatus(me->current) == 1)
+        while (1)
         {
+            if( me==NULL||lockGameStatus(me->current)==2){
+                break;
+            }
             char command[SIZE_OF_HEAD + 1];
             int count = recv(sock2, command, SIZE_OF_HEAD, 0);
             command[count] = '\0';

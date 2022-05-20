@@ -3,6 +3,7 @@
 
 extern pthread_mutex_t verrou;
 
+
 void check_ghost(game *game, joueur *joueur, int sock)
 {
     pthread_mutex_lock(&verrou);
@@ -198,7 +199,6 @@ void no_collision(void (*mov)(fantome *fantome, game *game), fantome *fantom, ga
  */
 void ghost_move(fantome *fantome, game *game)
 {
-    srand(time(NULL));
     int direction = rand() % 4;
     switch (direction)
     {

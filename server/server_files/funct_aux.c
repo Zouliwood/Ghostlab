@@ -461,10 +461,9 @@ void movPlayer(int sock, int dir, joueur *player, listElements *games)
 void quit_game(int sock, joueur *player, listElements *games)
 {
     // execution du iquit
-    if (!player->current)
+    if (player->current!=NULL)
     {
-        int joueurs_in_game = getListCount(player->current->joueurs);
-        if (joueurs_in_game == 1)
+        if (getListCount(player->current->joueurs) == 1)
         {
             removeEl(player->current->joueurs, player->current->joueurs->first);
             pthread_mutex_lock(&verrou);
@@ -488,7 +487,7 @@ void quit_game(int sock, joueur *player, listElements *games)
             pthread_mutex_lock(&verrou);
             element *ptr = player->current->joueurs->first;
             pthread_mutex_unlock(&verrou);
-            for (int i = 0; i < joueurs_in_game; i++)
+            for (int i = 0; i < getListCount(player->current->joueurs); i++)
             {
                 if (ptr->data == player)
                     break;
