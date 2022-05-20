@@ -4,7 +4,6 @@ import java.util.LinkedList;
 
 public class Plateau {
     int [][] plateau;//0 non decouvert + 1 praticable + 2 mur
-    LinkedList<Fantome> listFantome =new LinkedList<>();
     Joueur player;
 
     Plateau(int height, int width, int initX, int initY){
@@ -56,7 +55,6 @@ public class Plateau {
 
         boolean isBlocked(int direction, int nbrCase){
             if (direction==0){//haut
-                System.out.println("_"+oldy+"_"+nbrCase+"_"+y+"_");
                 return oldy+nbrCase>y;
             }else if (direction==1){//droite
                 return oldx+nbrCase>x;
@@ -72,20 +70,5 @@ public class Plateau {
             this.x=x;
             this.y=y;
         }
-    }
-
-    private static class Fantome {
-        private int x, y;
-
-        Fantome(int x, int y){
-            this.x=x;
-            this.y=y;
-        }
-
-        public void updatePos(int x, int y){
-            this.x=x;
-            this.y=y;
-        }
-
     }
 }
