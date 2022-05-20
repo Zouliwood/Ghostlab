@@ -5,6 +5,8 @@ import java.util.LinkedList;
 public class Plateau {
     int [][] plateau;//0 non decouvert + 1 praticable + 2 mur
     Joueur player;
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String BLUE = "\033[0;34m";
 
     Plateau(int height, int width, int initX, int initY){
         plateau=new int[height][width];
@@ -35,7 +37,7 @@ public class Plateau {
         for (int i = plateau.length-1; i>=0; i--) {
             for (int j = 0; j < plateau[0].length; j++) {
                 if (player.y==i && player.x==j){
-                    System.out.print("X ");
+                    System.out.print(BLUE+"\u2B1B "+ANSI_RESET);
                 }else System.out.print((plateau[i][j]==2)?"\u2B1B ":"\u2B1C ");
             }
             System.out.println();
