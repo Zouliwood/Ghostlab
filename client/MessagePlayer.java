@@ -151,7 +151,7 @@ class MessagePlayer {
     // ----------------------------------------------------------------------------------------------------------------------
 
     // [START***]
-    public PlayerMulticast readyPlay() {
+    public String[] readyPlay() {
         try {
             // request
             String s = "START" + END_TCP;
@@ -198,7 +198,11 @@ class MessagePlayer {
                         System.out.println("La partie " + idGame + " a pour hauteur " + heightMap + ", largeur "
                                 + widthMap + ", nombre de fantomes " + nbrGhost + ", adresse ip de multidiffusion "
                                 + ipMultiDiff + " et port de multidiffusion " + portMultiDiff);
-                        return new PlayerMulticast(ipMultiDiff, portMultiDiff);
+                        return new String[]{
+                                ipMultiDiff, Integer.toString(portMultiDiff),
+                                Integer.toString(widthMap), Integer.toString(heightMap)
+                        };
+                        //return new PlayerMulticast(ipMultiDiff, portMultiDiff);
                     }
                 }
             }
@@ -213,7 +217,7 @@ class MessagePlayer {
         return null;
     }
 
-    public boolean getposIT(){
+    public String[] getposIT(){
         // response
         byte[] response = readFirstMessage(in);
         if (response == null)
@@ -228,10 +232,10 @@ class MessagePlayer {
             String corrY = responseString.substring(19, 22);
 
             System.out.println("Joueur : " + idPlayer + " a pour position (" + corrX + "," + corrY + ").");
-            return true;
+            return new String[]{"true", corrX, corrY};
         } else
             System.out.println(Error.requestClient);
-        return false;
+        return new String[]{"false"};
     }
 
     // [UNREG***]
@@ -351,7 +355,7 @@ class MessagePlayer {
     // Deplacement
 
     // [DOMOV d***] [UPMOV d***] [RIMOV d***] [LEMOV d***]
-    public boolean goMove(int direction, String nbrCase) {
+    public String[] goMove(int direction, String nbrCase) {
         String move;
         if (direction==0) move="DOMOV";
         else if (direction==1) move="UPMOV";
@@ -369,22 +373,24 @@ class MessagePlayer {
                 String coordX = responseString.substring(6,9);
                 String coordY = responseString.substring(10, 13);
                 System.out.println("Vos nouvelles coordonnées sont (" + coordX + "," + coordY + ").");
+                return new String[]{"false", coordX, coordY};
             } else if(responseString.startsWith("MOVEF")){
                 String coordX = responseString.substring(6,9);
                 String coordY = responseString.substring(10, 13);
                 String nbrPtsPlayer = responseString.substring(14, 18);
                 System.out.println("Vos nouvelles coordonnées sont (" + coordX + "," + coordY + ") "
                         + " et votre nouveau score est de " + nbrPtsPlayer+".");
+                return new String[]{"false", coordX, coordY};
             } else if (responseString.startsWith("GOBYE")) {
                 System.out.println("La partie est terminée.");
-                return true;
+                return new String[]{"true"};
             } else System.out.println(Error.requestClient);
-            return false;
+            return new String[]{"false"};
         } catch (NullPointerException e) {
             System.out.println(Error.responseServ);
             e.printStackTrace();
         }
-        return false;
+        return new String[]{"false"};
     }
 
     public void initPlayer() throws IOException {

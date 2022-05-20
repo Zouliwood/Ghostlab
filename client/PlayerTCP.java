@@ -39,6 +39,7 @@ public class PlayerTCP implements Runnable{
 
             Thread multiT=null;
             PlayerMulticast multicastP=null;
+            Plateau platPlayer=null;
 
             int status = 1;
             int idGame = -1;
@@ -92,12 +93,23 @@ public class PlayerTCP implements Runnable{
                         }
                     }
                     if (startGame == 0) {
-                        multicastP=mp.readyPlay();
+                        //get dimension map
+                        String[] arrRespString=mp.readyPlay();
+                        multicastP= new PlayerMulticast(arrRespString[0], Integer.parseInt(arrRespString[1]));
                         multiT=new Thread(multicastP);
                         multiT.start();
-
-                        flag = mp.getposIT();
-                        if (flag) hist.newGame();
+                        //get pos player
+                        String[] arrResponsePosString = mp.getposIT();
+                        flag = Boolean.parseBoolean(arrResponsePosString[0]);
+                        if (flag) {
+                            hist.newGame();
+                            int widthmap=Integer.parseInt(arrRespString[2]);
+                            int heightmap=Integer.parseInt(arrRespString[3]);
+                            int posxplayer=Integer.parseInt(arrResponsePosString[1]);
+                            int posyplayer=Integer.parseInt(arrResponsePosString[2]);
+                            //init map player
+                            platPlayer=new Plateau(heightmap, widthmap, posxplayer, posyplayer);
+                        }
                     } else {
                         flag = false;
                         status = execOtherCmd(ot, in, mp, 2);//current step -> filter cmd
@@ -128,6 +140,8 @@ public class PlayerTCP implements Runnable{
                             boolean flagerror;
                             flag = false;
                             do {
+                                //print player map
+                                if (platPlayer!=null)platPlayer.printPlateau();
                                 System.out.println("Dans quelle direction souhaitez-vous vous déplacer :\n" +
                                         "Vers le haut [0]\n" +
                                         "Vers la droite [1]\n" +
@@ -143,7 +157,15 @@ public class PlayerTCP implements Runnable{
                                         } else {
                                             flagerror = false;
                                             String distanceStr = String.format("%03d", distance);
-                                            flag = mp.goMove(direction, distanceStr);
+                                            String[] respDirectionString = mp.goMove(direction, distanceStr);
+                                            flag = Boolean.parseBoolean(respDirectionString[0]);
+                                            //update mov player map
+                                            if (respDirectionString.length==3 && platPlayer!=null){
+                                                platPlayer.addWall(direction, distance,
+                                                        Integer.parseInt(respDirectionString[1]),
+                                                        Integer.parseInt(respDirectionString[2])
+                                                );
+                                            }
                                         }
                                     } catch (NumberFormatException e) {
                                         flagerror = true;
