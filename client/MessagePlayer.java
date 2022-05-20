@@ -357,9 +357,9 @@ class MessagePlayer {
     // [DOMOV d***] [UPMOV d***] [RIMOV d***] [LEMOV d***]
     public String[] goMove(int direction, String nbrCase) {
         String move;
-        if (direction==0) move="DOMOV";
-        else if (direction==1) move="UPMOV";
-        else if (direction==2) move="RIMOV";
+        if (direction==0) move="UPMOV";
+        else if (direction==1) move="RIMOV";
+        else if (direction==2) move="DOMOV";
         else move="LEMOV";
         try {
             // request
