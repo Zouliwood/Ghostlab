@@ -33,10 +33,10 @@ public class Plateau {
    }
 
     void printPlateau(){
-        for (int i = 0; i < plateau.length; i++) {
+        for (int i = plateau.length-1; i>=0; i--) {
             for (int j = 0; j < plateau[0].length; j++) {
-                if (player.x==i && player.y==j){
-                    System.out.print("X ");
+                if (player.y==i && player.x==j){
+                    System.out.print(" X ");
                 }else System.out.print((plateau[i][j]==2)?"\u2B1B ":"\u2B1C ");
             }
             System.out.println("");
