@@ -1,12 +1,10 @@
 package client;
 
-import java.util.LinkedList;
-
 public class Plateau {
-    int [][] plateau;//0 non decouvert + 1 praticable + 2 mur
-    Joueur player;
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String BLUE = "\033[0;34m";
+    private final int [][] plateau;//0 non decouvert + 1 praticable + 2 mur
+    private final Joueur player;
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String BLUE = "\033[0;34m";
 
     Plateau(int height, int width, int initX, int initY){
         plateau=new int[height][width];
@@ -22,11 +20,11 @@ public class Plateau {
         player.updatePos(newX, newY);
         if (player.isBlocked(direction, nbrCase)){
             if (direction==0){//haut
-                if (player.y+1<plateau.length)this.plateau[player.y+1][player.x]=2;
+                if (player.y-1>=0)this.plateau[player.y-1][player.x]=2;
             } else if (direction==1) {//droite
                 if (player.x+1<plateau[0].length)this.plateau[player.y][player.x+1]=2;
             } else if (direction==2) {//bas
-                if (player.y-1>=0)this.plateau[player.y-1][player.x]=2;
+                if (player.y+1<plateau.length)this.plateau[player.y+1][player.x]=2;
             }else{//gauche
                 if (player.x-1>=0)this.plateau[player.y][player.x-1]=2;
             }
@@ -34,7 +32,7 @@ public class Plateau {
    }
 
     void printPlateau(){
-        for (int i = plateau.length-1; i>=0; i--) {
+        for (int i = 0; i<plateau.length; i++) {
             for (int j = 0; j < plateau[0].length; j++) {
                 if (player.y==i && player.x==j){
                     System.out.print(BLUE+"\u2B1B "+ANSI_RESET);
@@ -57,16 +55,16 @@ public class Plateau {
 
         boolean isBlocked(int direction, int nbrCase){
             if (direction==0){//haut
-                return oldy+nbrCase>y;
+                return oldy-nbrCase<y;
             }else if (direction==1){//droite
                 return oldx+nbrCase>x;
             }else if (direction==2){//bas
-                return oldy-nbrCase<y;
+                return oldy+nbrCase>y;
             }else{//gauche
                 return oldx-nbrCase<x;
             }
         }
-        public void updatePos(int x, int y){
+        void updatePos(int x, int y){
             this.oldx=this.x;
             this.oldy=this.y;
             this.x=x;
