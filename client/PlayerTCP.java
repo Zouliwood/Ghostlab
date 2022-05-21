@@ -11,7 +11,7 @@ public class PlayerTCP implements Runnable{
     private final String hostName;
     private final int port;
     private final String pseudoClient;
-    private final String clientUDP;
+    private String clientUDP;
 
     public PlayerTCP(String hostName, int port, String pseudoClient, String clientUDP, Historique hist) {
         this.port = port;
@@ -27,13 +27,32 @@ public class PlayerTCP implements Runnable{
             Socket socket = new Socket(hostName, port);
             DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
             DataOutputStream ot = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-            MessagePlayer mp = new MessagePlayer(ot, in, pseudoClient);
-            //TODO: remvd
-            mp.initPlayer();
-            //user information has been registered correctly
 
             int UDPClient=Integer.parseInt(clientUDP);
-            PlayerUDP pUDP=new PlayerUDP(UDPClient);
+            PlayerUDP pUDP=null;
+            while (pUDP==null){
+                try{
+                    pUDP=new PlayerUDP(UDPClient);
+                }catch (Exception e){
+                    System.out.println("Le port est indisponible.");
+                    clientUDP = "-1";
+                    while (clientUDP.equals("-1")) {
+                        System.out.println("Veuillez saisir votre port (4 chiffres):");
+                        try {
+                            clientUDP = new Scanner(System.in).nextLine();
+                            if (Integer.parseInt(clientUDP)>9999 || Integer.parseInt(clientUDP)<1023) clientUDP="-1";
+                        } catch (Exception ingnored) {
+                            clientUDP = "-1";
+                        }
+                    }
+                    UDPClient=Integer.parseInt(clientUDP);
+                }
+            }
+
+            //user information has been registered correctly
+            MessagePlayer mp = new MessagePlayer(ot, in, pseudoClient);
+            mp.initPlayer();
+
             Thread udpT = new Thread(pUDP);
             udpT.start();
 
@@ -190,7 +209,7 @@ public class PlayerTCP implements Runnable{
                         }
                     } while (!flag);
                     endGame(socket, multicastP, multiT, pUDP, udpT);
-                    //TODO: re connecter le client et ne pas break?
+                    //TODO: connect the client again
                     status = 1;
                     break;
                 }

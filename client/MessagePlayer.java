@@ -163,7 +163,6 @@ class MessagePlayer {
             String responseString;
 
             while (true) {
-                // TODO: bon?
                 // pour ne pas saturer le processeur
                 try {
                     Thread.sleep(1);
@@ -206,7 +205,6 @@ class MessagePlayer {
                     }
                 }
             }
-            //TODO: posIT
         } catch (NullPointerException e) {
             System.out.println(Error.responseServ);
             e.printStackTrace();
@@ -293,8 +291,6 @@ class MessagePlayer {
         }
         return false;
     }
-
-    // TODO: que faire si wait un long moment + gerer cas erreur default
 
     // [MALL? mess***]
     public boolean messAllPlayer(String message) {
@@ -558,7 +554,7 @@ class MessagePlayer {
     }
 
     private byte[] readFirstMessage(DataInputStream data) {
-        byte[] response = new byte[50];//TODO: change size???
+        byte[] response = new byte[50];
         try {
             int cpt = 0;
             int nbrStars = 0;
@@ -580,8 +576,6 @@ class MessagePlayer {
     private byte[] readMessage(DataInputStream data) {
         return readFirstMessage(data);
     }
-
-    // TODO: vider le in en cas d'erreur?
 
     private byte[] converting(byte[] value) {
         final int length = value.length;
