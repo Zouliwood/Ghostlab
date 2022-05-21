@@ -229,8 +229,8 @@ class MessagePlayer {
             String corrX = responseString.substring(15, 18);
             String corrY = responseString.substring(19, 22);
 
-            System.out.println("Joueur : " + idPlayer + " a pour position (" + corrX + "," + corrY + ").");
-            return new String[]{"true", corrX, corrY};
+            System.out.println("Joueur : " + idPlayer + " a pour position (" + corrY + "," + corrX + ").");
+            return new String[]{"true", corrY, corrX};
         } else
             System.out.println(Error.requestClient);
         return new String[]{"false"};
@@ -368,15 +368,15 @@ class MessagePlayer {
             if (responseString.startsWith("MOVE!")) {
                 String coordX = responseString.substring(6,9);
                 String coordY = responseString.substring(10, 13);
-                System.out.println("Vos nouvelles coordonnées sont (" + coordX + "," + coordY + ").");
-                return new String[]{"false", coordX, coordY};
+                System.out.println("Vos nouvelles coordonnées sont (" + coordY + "," + coordX + ").");
+                return new String[]{"false", coordY, coordX};
             } else if(responseString.startsWith("MOVEF")){
                 String coordX = responseString.substring(6,9);
                 String coordY = responseString.substring(10, 13);
                 String nbrPtsPlayer = responseString.substring(14, 18);
-                System.out.println("Vos nouvelles coordonnées sont (" + coordX + "," + coordY + ") "
+                System.out.println("Vos nouvelles coordonnées sont (" + coordY + "," + coordX + ") "
                         + " et votre nouveau score est de " + nbrPtsPlayer+".");
-                return new String[]{"false", coordX, coordY};
+                return new String[]{"false", coordY, coordX};
             } else if (responseString.startsWith("GOBYE")) {
                 System.out.println("La partie est terminée.");
                 return new String[]{"true"};
@@ -525,7 +525,7 @@ class MessagePlayer {
                         String corrY = responseString.substring(19, 22);
                         String pts = responseString.substring(23, 27);
 
-                        System.out.println("Le joueur " + idPlayer + " est en position (" + corrX + "," + corrY + ") et a "
+                        System.out.println("Le joueur " + idPlayer + " est en position (" + corrY + "," + corrX + ") et a "
                                 + pts + " points.");
                     } else
                         System.out.println(Error.responseServ);
