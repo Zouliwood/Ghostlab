@@ -14,6 +14,9 @@ Groupe 60:
 
 - Quant a lui le serveur a été réaliser en C.
 
+    Le serveur est composé d'un main qui accepte les connexions et crée un thread par client.
+    Les threads interagissent avec les parties encours à l'aide de fonctions muni de lock, le verrou étant initialisé dans le main.
+    Le port d'envoie UDP et l'addresse multicast sont créer à la creation d'une partie et utilisé par les fonctions auxiliaire.
 
 ## Compilation
 Pour compiler le projet il suffit d'exécuter la commande make dans le terminal.
@@ -33,6 +36,7 @@ Les commandes suivantes sont a réaliser depuis la racine du projet.
 - Pour démarrer le client il suffit d'exécuter la commande `./java client.Client [adresse] [port]`
 
     Ici il est obligatoire de rentrer des valeurs pour l'adresse et le port.
+    L'adresse ici est une ip ou un nom de domaine.
 
 - //selection des options
 
