@@ -58,11 +58,13 @@ void *client_thread(void *socket)
         int count = recv(sock2, command, SIZE_OF_HEAD, 0);
         command[count] = '\0';
         printf("count= %d and command= %s\n", count, command);
-        if(count == 0){
-            if(me==NULL)goto end;
+        if (count == 0)
+        {
+            if (me == NULL)
+                goto end;
             else
             {
-                func_unreg(me,games,sock2,1);
+                func_unreg(me, games, sock2, 1);
                 goto end;
             }
         }
@@ -103,7 +105,7 @@ void *client_thread(void *socket)
             }
             else
             {
-                me = func_unreg(me, games, sock2,0);
+                me = func_unreg(me, games, sock2, 0);
             }
         }
         else if (strcmp(command, SIZEC) == 0)
@@ -165,9 +167,12 @@ void *client_thread(void *socket)
             char command[SIZE_OF_HEAD + 1];
             int count = recv(sock2, command, SIZE_OF_HEAD, 0);
             command[count] = '\0';
-            if( me==NULL||lockGameStatus(me->current)==2){
+            if (me == NULL || lockGameStatus(me->current) == 2)
+            {
                 break;
-            }else if(count == 0){
+            }
+            else if (count == 0)
+            {
                 break;
             }
             printf("count= %d and command= %s\n", count, command);
@@ -204,7 +209,7 @@ void *client_thread(void *socket)
                     printf("not end tcp %s\n", buffer);
                 }
                 quit_game(sock2, me, games);
-                me=NULL;
+                me = NULL;
                 break;
             }
             else if (strcmp(GLISC, command) == 0)
@@ -223,27 +228,28 @@ void *client_thread(void *socket)
             else if (strcmp(MALLC, command) == 0)
             {
                 // MALL?
-                send_all(sock2,me);
+                send_all(sock2, me);
             }
             else if (strcmp(SENDC, command) == 0)
             {
                 // SEND?_id_mess
-                sendc(sock2,sendMess(sock2, me));
+                sendc(sock2, sendMess(sock2, me));
             }
             else
             {
                 func_send_dunno(sock2);
             }
-            printf("Fantome en jeu %d\n",getListCount(me->current->fantomes));
+            printf("Fantome en jeu %d\n", getListCount(me->current->fantomes));
         }
     }
-    nostart:;
+nostart:;
     if (me != NULL)
     {
         char poubelle[300];
         recv(sock2, poubelle, 300, 0);
         quit_game(sock2, me, games);
     }
-    end:close(sock2);
+end:
+    close(sock2);
     return NULL;
 }
