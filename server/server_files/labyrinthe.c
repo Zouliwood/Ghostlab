@@ -6,7 +6,7 @@ void freeMap(int** arr, int height){
 }
 
 void printMap(int** arr, int height, int width){
-    for (int i = 0; i < height; i++){
+    for (int i = 0; i<height; i++){
         for (int j = 0; j < width; j++) {
             printf("%s ", (arr[i][j])?"\u2B1B":"\u2B1C");
         }

@@ -237,7 +237,7 @@ void start_game(joueur *joueur, int socket)
     }
 }
 
-void *func_unreg(joueur *joueur, listElements *games, int sock)
+void *func_unreg(joueur *joueur, listElements *games, int sock, int disconnected)
 {
     // remove joueur from game and free mem
     uint8_t id = joueur->current->game_id;
@@ -270,6 +270,10 @@ void *func_unreg(joueur *joueur, listElements *games, int sock)
         removeEl(games, game_ptr);
     }
     free(joueur);
+    if (disconnected == 1)
+    {
+        return NULL;
+    }
     // send unrok
     int taille = SIZE_OF_HEAD + SIZE_OF_END + 1 + sizeof(uint8_t);
     char message[taille];
@@ -461,7 +465,7 @@ void movPlayer(int sock, int dir, joueur *player, listElements *games)
 void quit_game(int sock, joueur *player, listElements *games)
 {
     // execution du iquit
-    if (player->current!=NULL)
+    if (player->current != NULL)
     {
         if (getListCount(player->current->joueurs) == 1)
         {

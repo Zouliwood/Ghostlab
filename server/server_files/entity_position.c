@@ -49,12 +49,12 @@ void player_move(game *game, int direction, joueur *joueur, int distance, int so
     case 0:
         while (distance > 0)
         {
-            if (joueur->y + 1 >= game->heightMap || game->map[joueur->y + 1][joueur->x])
+            if (joueur->y - 1 < 0 || game->map[joueur->y - 1][joueur->x])
                 break;
             else
             {
                 pthread_mutex_lock(&verrou);
-                joueur->y += 1;
+                joueur->y -= 1;
                 pthread_mutex_unlock(&verrou);
                 check_ghost(game, joueur, sock);
             }
@@ -79,12 +79,12 @@ void player_move(game *game, int direction, joueur *joueur, int distance, int so
     case 2:
         while (distance > 0)
         {
-            if (joueur->y - 1 < 0 || game->map[joueur->y - 1][joueur->x])
+            if (joueur->y + 1 >= game->heightMap || game->map[joueur->y + 1][joueur->x])
                 break;
             else
             {
                 pthread_mutex_lock(&verrou);
-                joueur->y -= 1;
+                joueur->y += 1;
                 pthread_mutex_unlock(&verrou);
                 check_ghost(game, joueur, sock);
             }
@@ -203,14 +203,14 @@ void ghost_move(fantome *fantome, game *game)
     switch (direction)
     {
     case 0:
-        if (fantome->y + 1 >= game->heightMap || game->map[fantome->y + 1][fantome->x])
+        if (fantome->y - 1 < 0 || game->map[fantome->y - 1][fantome->x])
         {
             break;
         }
         else
         {
             pthread_mutex_lock(&verrou);
-            fantome->y += 1;
+            fantome->y -= 1;
             pthread_mutex_unlock(&verrou);
         }
         break;
@@ -225,12 +225,12 @@ void ghost_move(fantome *fantome, game *game)
         }
         break;
     case 2:
-        if (fantome->y - 1 < 0 || game->map[fantome->y - 1][fantome->x])
+        if (fantome->y + 1 >= game->heightMap || game->map[fantome->y + 1][fantome->x])
             break;
         else
         {
             pthread_mutex_lock(&verrou);
-            fantome->y -= 1;
+            fantome->y += 1;
             pthread_mutex_unlock(&verrou);
         }
         break;

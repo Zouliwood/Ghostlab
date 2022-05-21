@@ -20,7 +20,7 @@ void func_send_regno(int sock2);
 // START
 void start_game(joueur *joueur,int socket);
 // UNREG
-void *func_unreg(joueur *joueur, listElements *games, int sock);
+void *func_unreg(joueur *joueur, listElements *games, int sock,int disconnected);
 // LIST! + PLAYR
 void send_list(int sock, game *game_current);
 // SIZE?
