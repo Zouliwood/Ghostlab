@@ -26,9 +26,9 @@ void check_ghost(game *game, joueur *joueur, int sock)
             memmove(fantome_taken + SIZE_OF_HEAD + 9, " ", 1);
             sprintf(fantome_taken + SIZE_OF_HEAD + 10, "%04d", joueur->score);
             memmove(fantome_taken + SIZE_OF_HEAD + 14, " ", 1);
-            sprintf(fantome_taken + SIZE_OF_HEAD + 15, "%03d", joueur->x);
+            sprintf(fantome_taken + SIZE_OF_HEAD + 15, "%03d", joueur->y);
             memmove(fantome_taken + SIZE_OF_HEAD + 18, " ", 1);
-            sprintf(fantome_taken + SIZE_OF_HEAD + 19, "%03d", joueur->y);
+            sprintf(fantome_taken + SIZE_OF_HEAD + 19, "%03d", joueur->x);
             memmove(fantome_taken + SIZE_OF_HEAD + 22, "+++", SIZE_OF_END);
             fantome_taken[size_mess] = '\0';
             sendMulticast(joueur->current, fantome_taken,size_mess);
