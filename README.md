@@ -21,6 +21,7 @@ Groupe 60:
 
 ## Compilation
 Pour compiler le projet, il suffit d'exécuter la commande make dans le terminal.
+Utiliser make clean pour supprimer les .class et server_exe et make history pour clean la sérialisation.
 
 ## Utilisation
 Les commandes suivantes sont à réaliser depuis la racine du projet.
@@ -35,10 +36,10 @@ Les commandes suivantes sont à réaliser depuis la racine du projet.
 - Pour interrompre le serveur il est nécessaire de lui envoyer un signal : Ctrl+C
 
 ### 2 - Le client
-- Pour démarrer le client, il suffit d'exécuter la commande ./java client.Client [adresse] [port]`
+- Pour démarrer le client, il suffit d'exécuter la commande ./java client.Client [adresse] [port] // optionnel [fichier.ser]`
 
   Ici, il est obligatoire de rentrer des valeurs pour l'adresse et le port.
-
+  Ce troisième argument permet de récupérer le pseudo enregistré ainsi que son temps de jeu.
   L'adresse ici est une ip ou un nom de domaine.
 
 - Pour interagir avec le serveur, il suffit de sélectionner des options affichées dans le terminal puis de suivre les instructions.
