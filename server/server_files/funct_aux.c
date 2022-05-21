@@ -397,9 +397,9 @@ void send_posit(int sock, joueur *joueur)
     memmove(reponse + SIZE_OF_HEAD, " ", 1);
     memmove(reponse + SIZE_OF_HEAD + 1, joueur->id, 8);
     memmove(reponse + SIZE_OF_HEAD + 9, " ", 1);
-    sprintf(reponse + SIZE_OF_HEAD + 10, "%03d", joueur->x);
+    sprintf(reponse + SIZE_OF_HEAD + 10, "%03d", joueur->y);
     memmove(reponse + SIZE_OF_HEAD + 13, " ", 1);
-    sprintf(reponse + SIZE_OF_HEAD + 14, "%03d", joueur->y);
+    sprintf(reponse + SIZE_OF_HEAD + 14, "%03d", joueur->x);
     memmove(reponse + SIZE_OF_HEAD + 17, END_TCP, SIZE_OF_END);
     reponse[taille] = '\0';
     if (taille != send(sock, reponse, taille, 0))
@@ -436,9 +436,9 @@ void movPlayer(int sock, int dir, joueur *player, listElements *games)
     char games_mess[taille];
     memmove(games_mess, MOVES, SIZE_OF_HEAD);
     memmove(games_mess + SIZE_OF_HEAD, " ", 1);
-    sprintf(games_mess + SIZE_OF_HEAD + 1, "%03d", player->x);
+    sprintf(games_mess + SIZE_OF_HEAD + 1, "%03d", player->y);
     memmove(games_mess + SIZE_OF_HEAD + 4, " ", 1);
-    sprintf(games_mess + SIZE_OF_HEAD + 5, "%03d", player->y);
+    sprintf(games_mess + SIZE_OF_HEAD + 5, "%03d", player->x);
     memmove(games_mess + SIZE_OF_HEAD + 8, END_TCP, SIZE_OF_END);
     if (taille != send(sock, games_mess, taille, 0))
         printf("Coudln't send list!");
