@@ -78,9 +78,9 @@ void movGhost(game *game_current)
                 char ghost_mov[size];
                 memmove(ghost_mov,"GHOST",SIZE_OF_HEAD);
                 memmove(ghost_mov+SIZE_OF_HEAD," ",1);
-                sprintf(ghost_mov+SIZE_OF_HEAD+1,"%03d",current->x);
+                sprintf(ghost_mov+SIZE_OF_HEAD+1,"%03d",current->y);
                 memmove(ghost_mov+SIZE_OF_HEAD+4," ",1);
-                sprintf(ghost_mov+SIZE_OF_HEAD+5,"%03d",current->y);
+                sprintf(ghost_mov+SIZE_OF_HEAD+5,"%03d",current->x);
                 memmove(ghost_mov+SIZE_OF_HEAD+8,"+++",3);
                 sendMulticast(game_current,ghost_mov,size);
             }
