@@ -41,7 +41,7 @@ public class PlayerMulticast implements Runnable{
                         String pts_player=responseString.substring(15, 19);
                         String x_pos=responseString.substring(20, 23);
                         String y_pos=responseString.substring(24, 27);
-                        System.out.println(ANSI_RED+"Le joueur "+id_player+" a "+pts_player+" points et est en position ("+y_pos+","+x_pos+")."+ANSI_RESET);
+                        System.out.println(ANSI_RED+"Le joueur "+id_player+" a "+pts_player+" points et a pris un fantome en position ("+y_pos+","+x_pos+")."+ANSI_RESET);
                         break;
                     }
                     case "MESSA":{//MESSA id mess+++]
