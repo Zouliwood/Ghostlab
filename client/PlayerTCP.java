@@ -215,8 +215,7 @@ public class PlayerTCP implements Runnable{
                 }
             }
         }catch (Exception e) {
-            System.out.println("Statut du joueur: "+e);
-            e.printStackTrace();
+            System.out.println("Une erreur est survenue.");
         }
     }
 
