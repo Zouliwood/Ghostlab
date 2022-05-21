@@ -33,7 +33,7 @@ public class PlayerMulticast implements Runnable{
                     case "GHOST":{//[GHOST x y +++]
                         String x_pos=responseString.substring(6, 9);
                         String y_pos=responseString.substring(10, 13);
-                        System.out.println(ANSI_RED+"Un fantôme est en position ("+x_pos+","+y_pos+")."+ANSI_RESET);
+                        System.out.println(ANSI_RED+"Un fantôme est en position ("+y_pos+","+x_pos+")."+ANSI_RESET);
                         break;
                     }
                     case "SCORE":{//[SCORE id p x y+++]
@@ -41,7 +41,7 @@ public class PlayerMulticast implements Runnable{
                         String pts_player=responseString.substring(15, 19);
                         String x_pos=responseString.substring(20, 23);
                         String y_pos=responseString.substring(24, 27);
-                        System.out.println(ANSI_RED+"Le joueur "+id_player+" a "+pts_player+" points et est en position ("+x_pos+","+y_pos+")."+ANSI_RESET);
+                        System.out.println(ANSI_RED+"Le joueur "+id_player+" a "+pts_player+" points et est en position ("+y_pos+","+x_pos+")."+ANSI_RESET);
                         break;
                     }
                     case "MESSA":{//MESSA id mess+++]
