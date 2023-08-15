@@ -2,7 +2,7 @@
 
 **Équipe 60 :**
 - Gabriel TEIXEIRA
-- David SAAD
+- David ANDRAWOS SAAD
 
 ## Architecture
 - Le client est développé en Java.
